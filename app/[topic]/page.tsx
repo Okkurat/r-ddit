@@ -25,7 +25,7 @@ const TopicPage: FC<TopicPageProps> = async ({ params }) => {
 
   const topic: any = response;
 
-  if (!topic) return <div className="text-gray-500">Topic does not exist</div>
+  if (!topic) return <div className="text-gray-500">Topic does not exist</div>;
   console.log(topic);
 
   return (
@@ -59,22 +59,3 @@ const TopicPage: FC<TopicPageProps> = async ({ params }) => {
 };
 
 export default TopicPage;
-
-/*
-      <h1 className="text-2xl font-bold mb-4">This is the {params.topic} topic</h1>
-      <div className="flex flex-wrap gap-4">
-        {topic.posts.length > 0 ? (
-          topic.posts.map((post: PostSummary) => (
-            <div key={post.id} className="bg-white shadow-md rounded-lg p-4 w-full sm:w-1/2 lg:w-1/3">
-              <Link href={`/posts/${post.id}`} passHref>
-                <h2 className="text-xl font-semibold mb-2">{post.title || 'Untitled'}</h2>
-                <p className="text-gray-700 mb-2">{post.message}</p>
-                <small className="text-gray-500">Posts: {post.messagesCount}</small>
-              </Link>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-500">No posts available</p>
-        )}
-      </div>
-*/
