@@ -40,7 +40,7 @@ const TopicPage = async ({ params }: { params: Params }) => {
                   user.id === post.author ? 'border-t-4 border-red-500' : ''
                 }`}
               >
-                <Link href={`/posts/${post.id}`} passHref>
+                <Link href={`/${topic.name}/${post.id}`} passHref>
                   <h2 className="text-xl font-semibold mb-2">{post.title || 'Untitled'}</h2>
                   <p className="text-gray-700 mb-2">{post.message.content}</p>
                   <small className="text-gray-500">Posts: {post.messages.length}</small>

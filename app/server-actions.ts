@@ -48,7 +48,6 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
       }))
     };
 
-    console.log(JSON.stringify(topicSummary, null, 2));
     return topicSummary;
   } catch (error: unknown) {
     if (error instanceof Error) {

@@ -1,12 +1,11 @@
 'use client';
-
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useRef, useEffect } from 'react';
 import { createPost } from './actions';
 import { TopicType } from '@/types/types';
 import { useRouter } from 'next/navigation';
 
 interface CreatePostProps {
-  topics: TopicType[]  
+  topics: TopicType[]
 }
 
 const CreatePost = ({ topics }: CreatePostProps) => {
@@ -15,14 +14,21 @@ const CreatePost = ({ topics }: CreatePostProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<string>(topics[0]?.name || '');
-
   const router = useRouter();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      const textarea = textareaRef.current;
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [message]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
-
     try {
       const { savedPost, error } = await createPost({
         message,
@@ -43,6 +49,8 @@ const CreatePost = ({ topics }: CreatePostProps) => {
       else {
         setError('Unexpected error happened');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -50,7 +58,7 @@ const CreatePost = ({ topics }: CreatePostProps) => {
     <div>
       <h1 className="text-2xl font-bold mb-4">Create a New Post</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
+        <div>
           <label htmlFor="topic" className="block text-sm font-medium text-gray-700 mb-1">
             Select Topic:
           </label>
@@ -69,11 +77,11 @@ const CreatePost = ({ topics }: CreatePostProps) => {
           </select>
         </div>
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
             Title:
           </label>
           <input
-            id="name"
+            id="title"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -81,16 +89,18 @@ const CreatePost = ({ topics }: CreatePostProps) => {
           />
         </div>
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
             Message:
           </label>
-          <input
-            id="name"
-            type="text"
+          <textarea
+            id="message"
+            ref={textareaRef}
             value={message}
-            required
             onChange={(e) => setMessage(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+            rows={4}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-hidden"
+            style={{ resize: 'none' }}
           />
         </div>
         <button

@@ -7,13 +7,11 @@ import Topic from "@/models/topic";
 import { MessageData, PostData, PostProps } from "@/types/types";
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { string, z } from "zod";
 
 export async function createTopic(prevState: unknown, formData: FormData) {
-
   try {
     const user = await currentUser();
-    console.log(formData.get('name'));
     if (!user) {
       return { message: 'User does not exist' };
     }
@@ -42,7 +40,70 @@ export async function createTopic(prevState: unknown, formData: FormData) {
       message : 'Failed to create topic' 
     };
   }
+};
+
+interface MessageProps {
+  message: string;
+  post: string
+  topic: string;
 }
+
+export async function createMessage(props: MessageProps){
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { error: 'User does not exist' };
+    }
+    await connectDB();
+    const schema = z.object({
+      content: z.string().min(1, {message: 'Content must be at least 1 chraracter long'}),
+      author: z.string(),
+    })
+    const parse = schema.safeParse({
+      content: props.message,
+      author: user.id,
+    });
+    if(!parse.success){
+      return { error: 'Invalid input data' };
+    }
+    const topic = await Topic.findOne({ name: props.topic });
+    if (!topic) {
+      return { error: 'Topic not found' };
+    }
+    const newMessageData: MessageData = {
+      content: props.message,
+      author: user.id
+    };
+    const newMessage = new Message(newMessageData);
+    console.log("HELLO");
+    const post: any = await Post.findById(props.post).populate('message', '', Message);
+    if(!post){
+      return { error: 'Post not found' };
+    }
+    console.log(newMessage);
+    console.log("hello", post);
+    post.messages.push(newMessage._id);
+    await post.save();
+    await newMessage.save();
+    revalidatePath(`/${props.topic}/${props.post}`);
+    return { 
+      newMessage
+    };
+  
+  }
+  catch (error: unknown) {
+    if(error instanceof Error){
+      return { 
+        error: error.message || 'Failed to create post' 
+      };
+    }
+    else {
+      return { 
+        error: 'Unexpecetd error' || 'Failed to create post' 
+      };
+    }
+  }
+};
 
 export async function createPost(props: PostProps) {
 
@@ -106,4 +167,4 @@ export async function createPost(props: PostProps) {
       };
     }
   }
-}
+};
