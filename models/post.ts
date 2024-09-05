@@ -1,8 +1,8 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 
 interface IPost extends Document {
-  title?: string;
-  message: string;
+  title: string;
+  message: mongoose.Schema.Types.ObjectId;
   author: string;
   messages: mongoose.Schema.Types.ObjectId[];
   timestamp: Date;
@@ -10,13 +10,26 @@ interface IPost extends Document {
 
 const postSchema: Schema<IPost> = new mongoose.Schema({
   title: { type: String, required: false },
-  message: { type: String, required: true },
+  message: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    required: true,
+    ref: 'Message',
+  },
   author: { type: String, required: true },
   messages: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Message'
+    required: false,
+    ref: 'Message',
+    default: []
   }],
   timestamp: { type: Date, default: Date.now }
+});
+
+postSchema.pre('save', function (next) {
+  if (!this.title && this.message) {
+    this.title = this.message.toString().substring(0, 30);
+  }
+  next();
 });
 
 postSchema.set('toJSON', {

@@ -1,47 +1,65 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
-import { createTopic } from './actions';
-
-const CreateTopic = () => {
-  const [name, setName] = useState('');
+import { FormEvent, useState } from "react";
+import { createPost } from "../actions";
+import { useRouter } from 'next/navigation';
+const PostForm = (props: any) => {
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
-    setSuccess(null);
 
     try {
-      const { savedTopic, error } = await createTopic(name);
+      const { savedPost, error } = await createPost({
+        message,
+        title: title || undefined,
+        topic: { name: props.topic },
+      });
       if(error){
         setError('User not logged in !');
         return;
       }
-      setSuccess(`Topic created: ${savedTopic?.name}`);
+      if(savedPost && savedPost.id){
+        router.push(`/${props.topic}/${savedPost.id}`);
+      }
     } catch (error: any) {
       setError(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Create a New Topic</h1>
+      <h1 className="text-2xl font-bold mb-4">Create a New Post</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        </div>
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-            Topic Name:
+            Title:
           </label>
           <input
             id="name"
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            Message:
+          </label>
+          <input
+            id="name"
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -53,13 +71,11 @@ const CreateTopic = () => {
             loading ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
           } focus:outline-none focus:ring-2 focus:ring-blue-500`}
         >
-          {loading ? 'Creating...' : 'Create Topic'}
+          {loading ? 'Posting...' : 'Post'}
         </button>
         {error && <p className="text-red-500">{error}</p>}
-        {success && <p className="text-green-500">{success}</p>}
       </form>
     </div>
   );
 };
-
-export default CreateTopic;
+export default PostForm;
