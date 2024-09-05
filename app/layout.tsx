@@ -41,27 +41,24 @@ const RootLayout = async (props: RootLayoutProps) => {
             </div>
           </SignedOut>
           <SignedIn>
-            <header className="bg-gray-800 text-white p-4">
-              <div className="container mx-auto flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <nav className="flex items-center space-x-4">
+            <header>
+                <div className="flex-col gap-4">
+                  <nav className="flex w-full items-center justify-between border-b p-4 text-xl font-semibold">
                     <Link href="/" className="text-white hover:underline"><h1 className="text-2xl font-bold">R*ddit</h1></Link>
                     {topics.map((topic) => (
                       <Link key={topic.id} href={`/${topic.name}`} className="text-white hover:underline">
                         {topic.name}
                       </Link>
                     ))}
+                    <UserButton />
                   </nav>
                 </div>
-                <UserButton />
-              </div>
             </header>
             <main className="flex-grow container mx-auto p-4">
               {props.children}
             </main>
           </SignedIn>
-          <footer className="bg-gray-800 text-white text-center p-4">
-            <p>&copy; {new Date().getFullYear()} My Next.js App. All rights reserved.</p>
+          <footer>
           </footer>
         </body>
       </html>

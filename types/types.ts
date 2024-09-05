@@ -16,7 +16,7 @@ export interface NewPostData {
 
 export interface Message {
   author: any;
-  id: string;
+  _id: string;
   timestamp: string;
   content: string;
   replies: Reply[]
