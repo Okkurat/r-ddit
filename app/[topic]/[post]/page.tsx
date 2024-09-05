@@ -3,8 +3,10 @@ import Replies from './Replies';
 import connectDB from '@/lib/mongoose';
 import Message from '@/models/message';
 import { Message as MessageType, Post as PostType } from '@/types/types';
+import ReplyForm from './ReplyForm';
 interface Params {
   post: string;
+  topic: string;
 }
 
 const PostPage = async ({ params }: { params: Params }) => {
@@ -22,7 +24,6 @@ const PostPage = async ({ params }: { params: Params }) => {
   }
 
   if (!post) return <div>Post does not exist</div>;
-  console.log(post);
   return (
     <div>
       <h1>1. {post.title}</h1>
@@ -32,6 +33,7 @@ const PostPage = async ({ params }: { params: Params }) => {
       <div>
         <Replies messages={post.messages}></Replies>
       </div>
+      <ReplyForm topic={params.topic} post={params.post}></ReplyForm>
     </div>
   );
 };
