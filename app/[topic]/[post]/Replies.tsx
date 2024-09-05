@@ -1,16 +1,22 @@
-const Replies = (props: any) => {
-  console.log(props.messages);
+import { Message, Reply } from "@/types/general";
+
+interface RepliesProps {
+  messages: Message[]
+}
+
+const Replies = ({ messages }: RepliesProps) => {
+  console.log(messages);
   return (
     <div>
-      {props.messages.length > 0 ? (
-        props.messages.map((message: any, index: number) => (
-          <div key={message._id}>
+      {messages.length > 0 ? (
+        messages.map((message: Message, index: number) => (
+          <div key={message.id}>
             <h2>{index + 2} {message.timestamp || 'Untitled'}</h2>
             <p>{message.content}</p>
             {message.replies.length > 0 && (
               <div>
-                {message.replies.map((reply: any) => (
-                  <div key={reply._id}>
+                {message.replies.map((reply: Reply) => (
+                  <div key={reply.id}>
                     <p>{reply.content || 'No content'}</p>
                   </div>
                 ))}

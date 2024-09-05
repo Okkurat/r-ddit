@@ -2,28 +2,36 @@ import Post from '@/models/post';
 import Replies from './Replies';
 import connectDB from '@/lib/mongoose';
 import Message from '@/models/message';
+import { Post as PostType } from '@/types/general';
+import { Message as MessageType } from '@/types/general';
+interface Params {
+  post: string;
+}
 
-const PostPage = async ({ params }: { params: any }) => {
-  let topic: any = null;
-
+const PostPage = async ({ params }: { params: Params }) => {
+  let post: PostType | null = null;
   try {
     await connectDB();
-    topic = await Post.findById(params.post).populate('message', '', Message).exec();
+    post = await Post.findById(params.post)
+    .populate<{ message: MessageType }>('message', '', Message)
+    .populate<{ messages: MessageType[] }>('messages', '', Message)
+    .lean<PostType>()
+    .exec();
   } catch (error) {
     console.error('Error fetching post:', error);
     return <div>Error fetching post. Please try again later.</div>;
   }
 
-  if (!topic) return <div>Post does not exist</div>;
-  console.log(topic);
+  if (!post) return <div>Post does not exist</div>;
+  console.log(post);
   return (
     <div>
-      <h1>1. {topic.title}</h1>
+      <h1>1. {post.title}</h1>
       <p>
-        {topic.message.content}
+        {post.message.content}
       </p>
       <div>
-        <Replies messages={topic.messages}></Replies>
+        <Replies messages={post.messages}></Replies>
       </div>
     </div>
   );

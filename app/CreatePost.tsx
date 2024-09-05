@@ -2,8 +2,12 @@
 
 import { useState, FormEvent } from 'react';
 import { createPost } from './actions';
-import { CreatePostProps } from '@/types/general';
+import { TopicType } from '@/types/general';
 import { useRouter } from 'next/navigation';
+
+interface CreatePostProps {
+  topics: TopicType[]  
+}
 
 const CreatePost = ({ topics }: CreatePostProps) => {
   const [title, setTitle] = useState('');
@@ -26,16 +30,19 @@ const CreatePost = ({ topics }: CreatePostProps) => {
         topic: { name: selectedTopic },
       });
       if(error){
-        setError('User not logged in !');
+        setError(error);
         return;
       }
       if(savedPost && savedPost.id){
         router.push(`/${selectedTopic}/${savedPost.id}`);
       }
-    } catch (error: any) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+    } catch (error: unknown) {
+      if(error instanceof Error){
+        setError(error.message);
+      }
+      else {
+        setError('Unexpected error happened');
+      }
     }
   };
 
@@ -81,8 +88,8 @@ const CreatePost = ({ topics }: CreatePostProps) => {
             id="name"
             type="text"
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
             required
+            onChange={(e) => setMessage(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

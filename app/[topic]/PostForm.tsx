@@ -3,7 +3,13 @@
 import { FormEvent, useState } from "react";
 import { createPost } from "../actions";
 import { useRouter } from 'next/navigation';
-const PostForm = (props: any) => {
+
+interface PostFormPorps {
+  topic: string
+}
+
+
+const PostForm = (props: PostFormPorps) => {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,8 +34,13 @@ const PostForm = (props: any) => {
       if(savedPost && savedPost.id){
         router.push(`/${props.topic}/${savedPost.id}`);
       }
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      if(error instanceof Error) {
+        setError(error.message);
+      }
+      else {
+        setError('Unexpected error happened!');
+      }
     }
   };
 

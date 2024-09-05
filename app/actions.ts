@@ -4,34 +4,42 @@ import connectDB from "@/lib/mongoose";
 import Message from "@/models/message";
 import Post from "@/models/post";
 import Topic from "@/models/topic";
-import { NewPostData, PostProps } from "@/types/general";
+import { MessageData, PostData, PostProps } from "@/types/general";
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
-export async function createTopic(name: string) {
+export async function createTopic(prevState: unknown, formData: FormData) {
 
   try {
     const user = await currentUser();
+    console.log(formData.get('name'));
     if (!user) {
-      return { error: 'User does not exist' };
+      return { message: 'User does not exist' };
     }
+    const schema = z.object({
+      name: z.string().min(3, { message: 'Topic must be at least 3 characters long'}),
+    });
+    const parse = schema.safeParse({
+      name: formData.get('name'),
+    });
     await connectDB();
 
-    if (!name) {
-      return { error: 'Invalid input data' };
+    if (!parse.success) {
+      return { message: 'Invalid input data' };
     }
-
+    const data = parse.data;
     const newTopic = new Topic({
-      name
+      name: data.name
     });
 
-    const savedTopic = await newTopic.save();
-
-    return { savedTopic: { name: savedTopic.name, id: savedTopic.id.toString() } };
+    await newTopic.save();
+    revalidatePath('/');
+    return { message: `Added a new topic ${data.name}` };
   } 
-  catch (error: any) {
+  catch (error) {
     return { 
-      error: error.message || 'Failed to create topic' 
+      message : 'Failed to create topic' 
     };
   }
 }
@@ -45,7 +53,19 @@ export async function createPost(props: PostProps) {
     }
     await connectDB();
 
-    if (!props.message) {
+    const schema = z.object({
+      content: z.string().min(1, { message: 'Topic must be at least 1 characters long'}),
+      author: z.string(),
+      title: z.string().optional(),
+      topic: z.string()
+    });
+    const parse = schema.safeParse({
+      content: props.message,
+      author: user.id,
+      title: props.title,
+      topic: props.topic.name
+    });
+    if(!parse.success){
       return { error: 'Invalid input data' };
     }
 
@@ -53,13 +73,13 @@ export async function createPost(props: PostProps) {
     if (!topic) {
       return { error: 'Topic not found' };
     }
-    const newMessageData: any = {
+    const newMessageData: MessageData = {
       content: props.message,
       author: user.id
     };
     const newMessage = new Message(newMessageData);
     const savedMessage = await newMessage.save();
-    const newPostData: any = {
+    const newPostData: PostData = {
       message: savedMessage.id,
       author: user.id,
       title: props.title
@@ -72,12 +92,18 @@ export async function createPost(props: PostProps) {
     revalidatePath(`/${props.topic.name}`);
     await topic.save();
     
-
     return { savedPost: { title: savedPost.title, message: savedPost.message, id: savedPost.id.toString() } };
   } 
-  catch (error: any) {
-    return { 
-      error: error.message || 'Failed to create post' 
-    };
+  catch (error: unknown) {
+    if(error instanceof Error){
+      return { 
+        error: error.message || 'Failed to create post' 
+      };
+    }
+    else {
+      return { 
+        error: 'Unexpecetd error' || 'Failed to create post' 
+      };
+    }
   }
 }

@@ -1,10 +1,11 @@
 import { currentUser } from '@clerk/nextjs/server';
 import '../lib/mongoose';
-import CreateTopic from './CreateTopic';
+import CreateTopic from './TopicForm';
 import connectDB from '../lib/mongoose';
 import Topic from '@/models/topic';
 import CreatePost from './CreatePost';
 import { TopicType } from '@/types/general';
+import TopicForm from './TopicForm';
 
 const HomePage = async () => {
   const user = await currentUser();

@@ -3,9 +3,6 @@ export interface PostProps {
   message: string;
   topic: TopicType
 }
-export interface CreatePostProps {
-  topics: TopicType[]  
-}
 export interface TopicType {
   name: string
 }
@@ -16,18 +13,33 @@ export interface NewPostData {
 }
 
 export interface Message {
+  author: any;
+  id: string;
+  timestamp: string;
+  content: string;
+  replies: Reply[]
+}
+export interface Reply {
+  id: string;
+  content: string
+}
+
+export interface PostData {
+  message: string;
+  author: string;
+  title?: string;
+}
+export interface MessageData {
   content: string;
   author: string;
-  timestamp: Date;
-  replies: Message[];
 }
 
 export interface Post {
-  id: string;
+  id?: string;
   title: string;
-  message: string;
+  message: Message;
   author: string;
-  messages: any[];
+  messages: Message[];
   timestamp: Date;
 }
 export interface TopicSummary {
