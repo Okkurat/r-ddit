@@ -4,7 +4,7 @@ import connectDB from "@/lib/mongoose";
 import Message from "@/models/message";
 import Post from "@/models/post";
 import Topic from "@/models/topic";
-import { MessageData, PostData, PostProps } from "@/types/general";
+import { MessageData, PostData, PostProps } from "@/types/types";
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";

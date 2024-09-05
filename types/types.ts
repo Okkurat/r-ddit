@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export interface PostProps {
   title?: string;
   message: string;
@@ -42,15 +44,41 @@ export interface Post {
   messages: Message[];
   timestamp: Date;
 }
+
 export interface TopicSummary {
-  name: string,
+  id: string;
+  name: string;
   posts: PostSummary[]
 }
+
 export interface PostSummary {
   id: string;
   title: string;
-  message: string;
+  message: MessageSummary;
   author: string;
-  messagesCount: number;
+  messages: Message[]
+  timestamp: string
+}
+
+export interface MessageSummary {
+  content: string;
+  author: string;
+}
+
+export interface PopulatedPost {
+  _id: Types.ObjectId;
+  title: string;
+  message: {
+    content: string;
+    author: string;
+  };
+  author: string;
+  messages: Message[];
   timestamp: Date;
+}
+
+export interface PopulatedTopic {
+  _id: Types.ObjectId;
+  name: string;
+  posts: PopulatedPost[];
 }

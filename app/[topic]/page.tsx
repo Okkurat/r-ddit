@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { fetchTopicData } from '../server-actions';
 import PostForm from './PostForm';
 import { currentUser } from '@clerk/nextjs/server';
-import { Post } from '@/types/general';
+import { Post } from '@/types/types';
 
 interface Params {
   topic: string

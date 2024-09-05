@@ -2,8 +2,7 @@ import Post from '@/models/post';
 import Replies from './Replies';
 import connectDB from '@/lib/mongoose';
 import Message from '@/models/message';
-import { Post as PostType } from '@/types/general';
-import { Message as MessageType } from '@/types/general';
+import { Message as MessageType, Post as PostType } from '@/types/types';
 interface Params {
   post: string;
 }

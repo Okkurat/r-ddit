@@ -1,4 +1,4 @@
-import { Message, Reply } from "@/types/general";
+import { Message, Reply } from "@/types/types";
 
 interface RepliesProps {
   messages: Message[]

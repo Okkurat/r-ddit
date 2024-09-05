@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import { createPost } from './actions';
-import { TopicType } from '@/types/general';
+import { TopicType } from '@/types/types';
 import { useRouter } from 'next/navigation';
 
 interface CreatePostProps {
