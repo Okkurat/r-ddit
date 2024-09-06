@@ -14,24 +14,31 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
 
     await connectDB();
     const topic = await Topic.findOne({ name: topicName })
-      .populate<PopulatedTopic>({
-        path: 'posts',
-        model: Post,
-        select: 'title message author messages timestamp',
-        populate: {
+    .populate<PopulatedTopic>({
+      path: 'posts',
+      model: Post,
+      select: 'title message author messages timestamp latestPost',
+      populate: [
+        {
           path: 'message',
           model: Message,
           select: 'content author -_id'
+        },
+        {
+          path: 'messages',
+          model: Message,
+          select: 'content author -_id'
         }
-      })
-      .select('-__v')
-      .lean()
-      .exec();
+      ]
+    })
+    .select('-__v')
+    .lean()
+    .exec();
 
     if (!topic) {
       return { error: 'Topic does not exist' };
     }
-
+    console.log("TOPIC", topic);
     const topicSummary: TopicSummary = {
       id: topic._id.toString(),
       name: topic.name,
@@ -44,10 +51,10 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
         },
         author: post.author,
         messages: post.messages,
-        timestamp: post.timestamp.toISOString()
+        timestamp: post.timestamp.toISOString(),
+        latestPost: post.latestPost
       }))
     };
-
     return topicSummary;
   } catch (error: unknown) {
     if (error instanceof Error) {

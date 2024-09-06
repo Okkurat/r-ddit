@@ -33,7 +33,7 @@ const PostPage = async ({ params }: { params: Params }) => {
     return message;
   });
   
-  const data = JSON.parse(JSON.stringify(post))
+  const data = JSON.parse(JSON.stringify(post));
 
   return (
     <PostMain params={params} post={data}></PostMain>

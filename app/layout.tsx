@@ -8,14 +8,8 @@ import {
   UserButton
 } from '@clerk/nextjs';
 import './globals.css';
-
 import connectDB from "@/lib/mongoose";
 import Topic from "@/models/topic";
-
-export const metadata = {
-  title: 'My Next.js App',
-  description: 'A simple Next.js application using the app directory with TypeScript',
-};
 
 type RootLayoutProps = {
   children: ReactNode;
@@ -27,8 +21,13 @@ const RootLayout = async (props: RootLayoutProps) => {
     await connectDB();
     topics = await Topic.find();
     topics.sort((a, b) => a.name.localeCompare(b.name));
-  } catch (error: any) {
-    throw Error(error.message || 'Failed to fetch topic' );
+  } catch (error: unknown) {
+    if(error instanceof Error){
+      throw Error(error.message || 'Failed to fetch topic' );
+    }
+    else {
+      throw Error('A unknown error occured');
+    }
   }
 
   return (
@@ -42,17 +41,23 @@ const RootLayout = async (props: RootLayoutProps) => {
           </SignedOut>
           <SignedIn>
             <header>
-                <div className="flex-col gap-4">
-                  <nav className="flex w-full items-center justify-between border-b p-4 text-xl font-semibold">
-                    <Link href="/" className="text-white hover:underline"><h1 className="text-2xl font-bold">R*ddit</h1></Link>
-                    {topics.map((topic) => (
-                      <Link key={topic.id} href={`/${topic.name}`} className="text-white hover:underline">
-                        {topic.name}
-                      </Link>
-                    ))}
-                    <UserButton />
-                  </nav>
-                </div>
+              <div className="flex-col gap-4">
+                <nav className="bg-[#333333] flex w-full items-center justify-between border-b p-4 text-xl font-semibold">
+                  <Link href="/" className="text-white hover:underline">
+                    <h1 className="text-2xl font-bold text-white" style={{
+                      textShadow: `-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000`
+                    }}>
+                      R*ddit
+                    </h1>
+                  </Link>
+                  {topics.map((topic) => (
+                    <Link key={topic.id} href={`/${topic.name}`} className="text-white hover:underline">
+                      {topic.name}
+                    </Link>
+                  ))}
+                  <UserButton />
+                </nav>
+              </div>
             </header>
             <main className="flex-grow container mx-auto p-4">
               {props.children}

@@ -26,7 +26,7 @@ const HomePage = async () => {
     }
   }
   return (
-    <div className="flex flex-col max-w-3xl mx-auto">
+    <div className="flex flex-col max-w-7xl mx-auto p-4">
       <h1 className="text-4xl font-bold">Next.js App</h1>
       <h2 className="text-xl mt-4">Username: {username}</h2>
       <CreatePost topics={topics}></CreatePost>

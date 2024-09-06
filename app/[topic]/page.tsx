@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { fetchTopicData } from '../server-actions';
 import PostForm from './PostForm';
 import { currentUser } from '@clerk/nextjs/server';
-import { Post } from '@/types/types';
+import { Message, Post } from '@/types/types';
 
 interface Params {
   topic: string
@@ -23,16 +23,16 @@ const TopicPage = async ({ params }: { params: Params }) => {
 
   const topic: any = response;
   if (!topic) return <div className="text-gray-400">Topic does not exist</div>;
-
+  topic.posts.sort((a: Post, b: Post) => {
+    return b.latestPost.getTime()- a.latestPost.getTime();
+  });
+  
   return (
     <div className="max-w-7xl mx-auto p-4 bg-black text-gray-200">
-      {/* Form Section */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-4">This is the {params.topic} topic</h1>
         <PostForm topic={params.topic} />
       </div>
-
-      {/* Cards Section */}
       <div className="grid grid-cols-4 gap-2">
         {topic.posts.length > 0 ? (
           topic.posts.map((post: Post) => (

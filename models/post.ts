@@ -6,6 +6,7 @@ interface IPost extends Document {
   author: string;
   messages: mongoose.Schema.Types.ObjectId[];
   timestamp: Date;
+  latestPost: Date;
 }
 
 const postSchema: Schema<IPost> = new mongoose.Schema({
@@ -22,14 +23,8 @@ const postSchema: Schema<IPost> = new mongoose.Schema({
     ref: 'Message',
     default: []
   }],
-  timestamp: { type: Date, default: Date.now }
-});
-
-postSchema.pre('save', function (next) {
-  if (!this.title && this.message) {
-    this.title = this.message.toString().substring(0, 30);
-  }
-  next();
+  timestamp: { type: Date, default: Date.now },
+  latestPost: { type: Date, default: Date.now }
 });
 
 postSchema.set('toJSON', {

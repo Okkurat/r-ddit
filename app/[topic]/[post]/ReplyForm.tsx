@@ -63,7 +63,7 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
             onChange={(e) => setValue(e.target.value)}
             required
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-dark-blue-800 overflow-hidden text-gray-700"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 bg-gray-150 overflow-hidden text-gray-700"
             style={{ resize: 'none' }}
           />
         </div>

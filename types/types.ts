@@ -29,7 +29,7 @@ export interface Reply {
 export interface PostData {
   message: string;
   author: string;
-  title?: string;
+  title: string;
 }
 export interface MessageData {
   content: string;
@@ -43,6 +43,7 @@ export interface Post {
   author: string;
   messages: Message[];
   timestamp: string;
+  latestPost: Date;
 }
 
 export interface TopicSummary {
@@ -58,6 +59,7 @@ export interface PostSummary {
   author: string;
   messages: Message[]
   timestamp: string
+  latestPost: Date;
 }
 
 export interface MessageSummary {
@@ -75,6 +77,7 @@ export interface PopulatedPost {
   author: string;
   messages: Message[];
   timestamp: Date;
+  latestPost: Date;
 }
 
 export interface PopulatedTopic {

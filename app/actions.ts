@@ -60,7 +60,7 @@ export async function createMessage(props: MessageProps){
       content: z.string().min(1, {message: 'Content must be at least 1 chraracter long'}),
       author: z.string(),
       replies: z.array(z.string()).optional()
-    })
+    });
     const parse = schema.safeParse({
       content: props.message,
       author: user.id,
@@ -84,6 +84,7 @@ export async function createMessage(props: MessageProps){
     }
 
     post.messages.push(newMessage._id);
+    post.latestPost = newMessage.timestamp;
     await post.save();
     await newMessage.save();
 
@@ -93,10 +94,10 @@ export async function createMessage(props: MessageProps){
         { $push: { replies: newMessage._id } }
       );
     }
-
+    
     revalidatePath(`/${props.topic}/${props.post}`);
     return { 
-      newMessage
+      newMessage: JSON.parse(JSON.stringify(newMessage))
     };
   
   }
@@ -152,7 +153,7 @@ export async function createPost(props: PostProps) {
     const newPostData: PostData = {
       message: savedMessage.id,
       author: user.id,
-      title: props.title
+      title: props.title || savedMessage.content.substring(0, 30)
     };
 
     const newPost = new Post(newPostData);
