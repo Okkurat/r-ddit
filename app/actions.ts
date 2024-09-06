@@ -46,6 +46,7 @@ interface MessageProps {
   message: string;
   post: string
   topic: string;
+  replies: string[];
 }
 
 export async function createMessage(props: MessageProps){
@@ -58,10 +59,12 @@ export async function createMessage(props: MessageProps){
     const schema = z.object({
       content: z.string().min(1, {message: 'Content must be at least 1 chraracter long'}),
       author: z.string(),
+      replies: z.array(z.string()).optional()
     })
     const parse = schema.safeParse({
       content: props.message,
       author: user.id,
+      replies: props.replies
     });
     if(!parse.success){
       return { error: 'Invalid input data' };
@@ -75,16 +78,22 @@ export async function createMessage(props: MessageProps){
       author: user.id
     };
     const newMessage = new Message(newMessageData);
-    console.log("HELLO");
     const post: any = await Post.findById(props.post).populate('message', '', Message);
     if(!post){
       return { error: 'Post not found' };
     }
-    console.log(newMessage);
-    console.log("hello", post);
+
     post.messages.push(newMessage._id);
     await post.save();
     await newMessage.save();
+
+    if (props.replies && props.replies.length > 0) {
+      await Message.updateMany(
+        { _id: { $in: props.replies } },
+        { $push: { replies: newMessage._id } }
+      );
+    }
+
     revalidatePath(`/${props.topic}/${props.post}`);
     return { 
       newMessage

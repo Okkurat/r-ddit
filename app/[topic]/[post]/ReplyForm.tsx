@@ -1,5 +1,6 @@
 'use client';
 import { createMessage } from "@/app/actions";
+import { useMessageContext, useMessageValue } from "@/context/MessageContext";
 import { FormEvent, useState, useRef, useEffect, FC } from "react";
 
 interface Params {
@@ -12,21 +13,26 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
+  const { value, setValue} = useMessageContext();
   useEffect(() => {
     if (textareaRef.current) {
       const textarea = textareaRef.current;
       textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
-  }, [message]);
+  }, [value]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
+    console.log(value);
+    const regex = />>(\w{24})/g;
+    const matches = value.match(regex) || [];
+
+    const replies = matches.map(match => match.slice(2));
     try {
-      const { error } = await createMessage({ message, topic, post });
+      const { error } = await createMessage({ message: value, topic, post, replies });
       if (error) {
         setError(error);
         return;
@@ -39,7 +45,6 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
       }
     } finally {
       setLoading(false);
-      setMessage('');
     }
   };
 
@@ -54,8 +59,8 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
           <textarea
             id="message"
             ref={textareaRef}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
             required
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-dark-blue-800 overflow-hidden text-gray-700"

@@ -1,4 +1,3 @@
-import { FC } from 'react';
 import Link from 'next/link';
 import { fetchTopicData } from '../server-actions';
 import PostForm from './PostForm';

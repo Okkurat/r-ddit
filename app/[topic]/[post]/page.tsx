@@ -1,9 +1,9 @@
 import Post from '@/models/post';
-import Replies from './Replies';
 import connectDB from '@/lib/mongoose';
 import Message from '@/models/message';
 import { Message as MessageType, Post as PostType } from '@/types/types';
-import ReplyForm from './ReplyForm';
+import PostMain from './PostMain';
+import React from "react";
 
 interface Params {
   post: string;
@@ -27,24 +27,16 @@ const PostPage = async ({ params }: { params: Params }) => {
   if (!post) return <div className="bg-black text-gray-400 p-4">Post does not exist</div>;
 
   console.log(post);
+  post.timestamp = (new Date(post.timestamp)).toLocaleString();
+  post.messages.map((message: MessageType) => {
+    message.timestamp = (new Date(message.timestamp)).toLocaleString();
+    return message;
+  });
+  
+  const data = JSON.parse(JSON.stringify(post))
 
   return (
-    <div>
-      <div className='bg-[#2A2A2A] p-4 rounded-lg'>
-        <h1 className="text-xl font-semibold mb-2">{post.title}</h1>
-        <div className="flex justify-between items-center mb-4">
-          <h2 id={params.post} className="text-lg font-semibold">{post.timestamp.toLocaleString()}</h2>
-          <button className="ml-auto bg-blue-700 text-white py-2 px-4 rounded hover:bg-blue-800">Reply</button>
-        </div>
-        <p className="mb-6">
-          {post.message.content}
-        </p>
-        <div className="mb-6 pl-4 border-l-2 border-gray-600">
-          <Replies messages={post.messages}></Replies>
-        </div>
-      </div>
-      <ReplyForm topic={params.topic} post={params.post}></ReplyForm>
-    </div>
+    <PostMain params={params} post={data}></PostMain>
   );
 };
 

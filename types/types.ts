@@ -42,7 +42,7 @@ export interface Post {
   message: Message;
   author: string;
   messages: Message[];
-  timestamp: Date;
+  timestamp: string;
 }
 
 export interface TopicSummary {
