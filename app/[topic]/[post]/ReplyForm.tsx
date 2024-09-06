@@ -1,6 +1,6 @@
 'use client';
 import { createMessage } from "@/app/actions";
-import { useMessageContext, useMessageValue } from "@/context/MessageContext";
+import { useMessageContext } from "@/context/MessageContext";
 import { FormEvent, useState, useRef, useEffect, FC } from "react";
 
 interface Params {

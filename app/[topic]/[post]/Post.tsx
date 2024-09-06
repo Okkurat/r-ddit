@@ -1,4 +1,4 @@
-import { useMessageContext, useMessageValue } from "@/context/MessageContext";
+import { useMessageContext } from "@/context/MessageContext";
 import Replies from "./Replies";
 
 import { Post as PostType, Reply } from "@/types/types";
