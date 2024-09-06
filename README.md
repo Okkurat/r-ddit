@@ -1,7 +1,3 @@
-Certainly! Here’s a polished version of your README:
-
----
-
 ## Next.js Textboard Application
 
 ### Overview
