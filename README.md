@@ -1,10 +1,28 @@
-Next.js textboard type of app. In active development. Using Clerk for authentication. TypeScript for type safety. MongoDB for database. TailwindCSS for styling. Zod for schema validation. Next.js 14 with app directory and server components and actions.
+Certainly! Here’s a polished version of your README:
 
-Despite the name, the app is more like an textboard.
+---
 
-TODO list:
-mongoDB schema type guarding (remove the use of any everywhere)
-Fancy up the UI
-Maybe add features like editing posts, deleting posts, etc.
-Add functionalities for users
-Write tests for the app
+## Next.js Textboard Application
+
+### Overview
+
+This application is a textboard-style platform currently under active development. It leverages the following technologies:
+
+- **Authentication**: Clerk
+- **Language**: TypeScript
+- **Database**: MongoDB
+- **Styling**: TailwindCSS
+- **Schema Validation**: Zod
+- **Framework**: Next.js 14 with App Directory and Server Components
+
+Despite its name, the application functions more like a traditional textboard.
+
+### TODO List
+
+- **Refine MongoDB Schema**: Improve type safety by eliminating the use of `any` throughout the application.
+- **Enhance UI**: Revamp the user interface to be more visually appealing and user-friendly.
+- **Implement Post Management Features**: Add functionality for editing and deleting posts.
+- **Expand User Features**: Introduce additional functionalities for user management and interaction.
+- **Write Tests**: Develop comprehensive tests to ensure the robustness and reliability of the application.
+
+---
