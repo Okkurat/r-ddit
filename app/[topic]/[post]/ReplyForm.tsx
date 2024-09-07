@@ -22,7 +22,7 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
     if (formRef.current && value !== '') {
-      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      formRef.current.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
   }, [value]);
 
@@ -49,6 +49,7 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
       }
     } finally {
       setLoading(false);
+      setValue('');
     }
   };
 
