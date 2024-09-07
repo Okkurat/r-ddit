@@ -4,8 +4,9 @@ import connectDB from "@/lib/mongoose";
 import Message from "@/models/message";
 import Post from "@/models/post";
 import Topic from "@/models/topic";
-import { MessageData, PostData, TopicType } from "@/types/types";
+import { MessageData, PostData, TopicType } from '@/lib/types';
 import { currentUser } from "@clerk/nextjs/server";
+import { ConnectionStates } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -82,7 +83,7 @@ export async function createMessage(props: MessageProps){
     if(!post){
       return { error: 'Post not found' };
     }
-    
+    console.log(post);
     post.messages.push(newMessage._id as any);
     post.latestPost = newMessage.timestamp;
     await post.save();

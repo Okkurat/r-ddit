@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { fetchTopicData } from '../server-actions';
 import PostForm from './PostForm';
 import { currentUser } from '@clerk/nextjs/server';
-import { PostPlain, TopicSummary } from '@/types/types';
+import { PostPlain, TopicSummary } from '@/lib/types';
 
 interface Params {
   topic: string

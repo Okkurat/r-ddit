@@ -1,4 +1,4 @@
-import { Message, Post } from "@/types/types";
+import { Message, Post } from '@/lib/types';
 import React from "react";
 import MessageComp from "./MessageComp";
 

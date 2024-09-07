@@ -2,7 +2,7 @@ import connectDB from "@/lib/mongoose";
 import Topic from "@/models/topic";
 import Post from "@/models/post";
 import Message from "@/models/message";
-import { MessageWithoutReplies, TopicSummary, PostPlain } from "@/types/types";
+import { MessageWithoutReplies, TopicSummary, PostPlain } from "@/lib/types";
 import { currentUser } from "@clerk/nextjs/server";
 
 export async function fetchTopicData(topicName: string): Promise<TopicSummary | { error: string }> {

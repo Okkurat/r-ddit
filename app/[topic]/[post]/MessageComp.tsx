@@ -1,7 +1,7 @@
 'use client';
 import { findMessage } from "@/app/actions";
 import { useMessageContext } from "@/context/MessageContext";
-import { Message as MessageType, Post, Reply} from "@/types/types";
+import { Message as MessageType, Post, Reply} from '@/lib/types';
 import React, { useState } from "react";
 
 interface RepliesProps {
@@ -14,7 +14,21 @@ interface RepliesProps {
 
 const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => {
 
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [showDiv, setShowDiv] = useState(false);
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    const x = event.pageX;
+    const y = event.pageY;
+    setPosition({ x, y });
+    setShowDiv(true);
+  };
+
   const [show, setShow] = useState(false);
+
+  const handleMouseLeave = () => {
+    setShowDiv(false);
+  };
 
   const isElementInViewport = (message_id: string): boolean => {
     const element = document.getElementById(message_id);
@@ -29,6 +43,18 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     }
     return false;
   };
+
+  const renderDiv = (message_id: string) => (
+    <div
+    className="absolute bg-[#2A2A2A] p-2 rounded pointer-events-none"
+    style={{
+      top: `${position.y + 10}px`,
+      left: `${position.x + 10}px`,
+      }}
+    >
+      Put the message here {message_id}
+    </div>
+  );
   
 
   const scrollToMessage = (message_id: string) => {
@@ -75,11 +101,17 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     }
     else {
       return (
-          <div className="inline text-red-400">
-            <a href="#" className="block text-blue-500">
-              {">>"}{message_id}
-            </a>
-          </div>
+        <div className="block">
+        <p
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          className="inline-block text-blue-500"
+        >
+          {">>"}{message_id}
+        </p>
+        {showDiv && renderDiv(message_id)}
+      </div>
+
     );
     }
   };
@@ -125,7 +157,6 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
 
   const findMessageIndex = (message_id: string) => {
     const index = post.messages.findIndex((message: MessageType) => message._id === message_id);
-    console.log(index);
     return index;
   };
 

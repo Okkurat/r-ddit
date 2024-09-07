@@ -1,7 +1,7 @@
 import Post from '@/models/post';
 import connectDB from '@/lib/mongoose';
 import Message from '@/models/message';
-import { Message as MessageType, Post as PostType, Reply } from '@/types/types';
+import { Message as MessageType, Post as PostType, Reply } from '@/lib/types';
 import PostMain from './PostMain';
 import React from "react";
 

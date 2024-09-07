@@ -3,7 +3,7 @@ import '../lib/mongoose';
 import connectDB from '../lib/mongoose';
 import Topic from '@/models/topic';
 import CreatePost from './CreatePost';
-import { TopicType } from '@/types/types';
+import { TopicType } from '@/lib/types';
 import TopicForm from './TopicForm';
 
 const HomePage = async () => {
