@@ -1,4 +1,3 @@
-import { useMessageContext } from "@/context/MessageContext";
 import { Message } from "@/types/types";
 import React from "react";
 import MessageComp from "./MessageComp";
@@ -9,15 +8,6 @@ interface RepliesProps {
 }
 
 const Replies = ({ post, messages }: RepliesProps) => {
-
-  const { value, setValue } = useMessageContext();
-  const handleClick = (message_id: string) => {
-    if (value.trim() === '') {
-      setValue(`>>${message_id}\n`);
-    } else {
-      setValue(`${value.trim()}\n>>${message_id}\n`);
-    }
-  };
 
   return (
     <div>

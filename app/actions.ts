@@ -115,6 +115,32 @@ export async function createMessage(props: MessageProps){
   }
 };
 
+export async function findMessage(message_id: string) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { error: 'User does not exist' };
+    }
+    await connectDB();
+    const message = await Message.findById(message_id);
+    if (!message) {
+      return { error: 'Message not found' };
+    }
+    return { message: JSON.parse(JSON.stringify(message)) };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return { 
+        error: error.message || 'Failed to find message' 
+      };
+    }
+    else {
+      return { 
+        error: 'Unexpecetd error' || 'Failed to find message' 
+      };
+    }
+  }
+};
+
 export async function createPost(props: PostProps) {
 
   try {
