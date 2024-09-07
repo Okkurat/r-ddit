@@ -30,7 +30,6 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
-    console.log(value);
     const regex = />>(\w{24})/g;
     const matches = value.match(regex) || [];
 

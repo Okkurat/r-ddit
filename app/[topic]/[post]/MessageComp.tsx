@@ -2,7 +2,7 @@
 import { findMessage } from "@/app/actions";
 import { useMessageContext } from "@/context/MessageContext";
 import { Message as MessageType} from "@/types/types";
-import React from "react";
+import React, { useState } from "react";
 
 interface RepliesProps {
   messages: MessageType[];
@@ -14,12 +14,32 @@ interface RepliesProps {
 
 const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => {
 
-  const scrollToMessage = (message_id: string) => {
+  const [show, setShow] = useState(false);
+
+  const isElementInViewport = (message_id: string): boolean => {
     const element = document.getElementById(message_id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      const rect = element.getBoundingClientRect();
+      return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+      );
+    }
+    return false;
+  };
+  
+
+  const scrollToMessage = (message_id: string) => {
+    if (!isElementInViewport(message_id)) {
+      const element = document.getElementById(message_id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   };
+  
   const { value, setValue } = useMessageContext();
   const handleClick = (message_id: string) => {
     if (value.trim() === '') {
@@ -110,6 +130,14 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     return parts;
   };
 
+  //console.log(message.replies);
+  //console.log(post.message.replies);
+  const findMessageIndex = (message_id: string) => {
+    const index = post.messages.findIndex((message: any) => message._id === message_id);
+    console.log(index); // Debugging
+    return index;
+  };
+
   if (isOP) {
     return (
       <div id={post.message._id}>
@@ -119,11 +147,36 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
           <button onClick={() => handleClick(post.message._id)} className="ml-auto bg-blue-700 text-white py-2 px-4 rounded hover:bg-blue-800">Reply</button>
         </div>
         <div>{splitMessageContent(message.content)}</div>
-        <button className="mb-2 ml-auto bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600">{post.message.replies.length}</button>
+        {message.replies.length > 0 && <button onClick={() => setShow(!show)} className="mb-2 ml-auto bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600">{post.message.replies.length}</button>}
+        {show && (
+        <div className="pl-4 border-l-2 border-red-500">
+        {message.replies.map((reply: any) => {
+          const indexInMessages = findMessageIndex(reply._id);
+          return (
+            <MessageComp
+              post={post}
+              messages={messages}
+              message={reply}
+              index={indexInMessages}
+              key={reply._id}
+              isOP={false}
+              />
+              );
+            })}
+            <button className="w-full bg-red-700 text-white py-2 px-4 rounded hover:bg-red-800"
+              onClick={() => {
+                setShow(!show)
+                scrollToMessage(post.message._id)
+              }
+            }
+            >
+              Hide
+            </button>
+        </div>
+      )}
       </div>
     );
   }
-  
 
   return (
     <div id={message._id}>
@@ -133,11 +186,37 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
           <button onClick={() => handleClick(message._id)} className="ml-auto bg-blue-700 text-white py-2 px-4 rounded hover:bg-blue-800">Reply</button>
         </div>
         <div>{splitMessageContent(message.content)}</div>
-        <button className="ml-auto bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600">{message.replies.length}</button>
+        {message.replies.length > 0 && <button onClick={() => setShow(!show)} className="ml-auto bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600">{message.replies.length}</button>}
         <div className="mb-1 pl-4 border-l-2 border-gray-600"></div>
       </div>
-    </div>
-  );
-};
+      {show && (
+        <div className="pl-4 border-l-2 border-red-500">
+        {message.replies.map((reply: any) => {
+          const indexInMessages = findMessageIndex(reply._id);
+          return (
+            <MessageComp
+              post={post}
+              messages={messages}
+              message={reply}
+              index={indexInMessages}
+              key={reply._id}
+              isOP={false}
+              />
+              );
+            })}
+            <button className="w-full bg-red-700 text-white py-2 px-4 rounded hover:bg-red-800"
+              onClick={() => {
+                setShow(!show)
+                scrollToMessage(message._id)
+              }
+            }
+            >
+              Hide
+            </button>
+        </div>
+      )}
+      </div>
+      );
+    };
 
 export default MessageComp;
