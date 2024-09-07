@@ -47,7 +47,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
 
   const renderDiv = (message_id: string) => (
     <div
-    className="absolute bg-[#2A2A2A] p-2 rounded pointer-events-none"
+    className="absolute bg-[#2A2A2A] p-2 rounded pointer-events-none max-w-[70%]"
     style={{
       top: `${position.y + 10}px`,
       left: `${position.x + 10}px`,
@@ -91,12 +91,32 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     }
     else if (message_id === post.message._id) {
       return (
-        <div onClick={() => scrollToMessage(message_id)} className="relative bg-[#2A2A2A] pt-2 pb-2 px-2 rounded-lg flex-col gap-2 py-2 border-t border-gray-600 pl-4 border-l-2 border-gray-600">
+        <div className="block">
+        <p
+          onClick={() => scrollToMessage(message_id)}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          className="inline-block text-blue-500"
+        >
+          {">>OP"}
+        </p>
+        {showDiv && (
+          <div
+          className="absolute bg-[#2A2A2A] p-2 rounded pointer-events-none max-w-[70%]"
+          style={{
+            top: `${position.y + 10}px`,
+            left: `${position.x + 10}px`,
+            }}
+          >
+        <div className="relative bg-[#2A2A2A] rounded-lg flex-col gap-2">
         <div className="flex flex-col gap-0 mb-0">
-            <p className="font-semibold">{post.timestamp ? post.timestamp : 'No timestamp'}</p>
+            <p className="font-semibold">1. {post.timestamp ? post.timestamp : 'No timestamp'}</p>
           </div>
           <div>{parseIndepMessage(post.message.content)}</div>
         <div className=" border-l-2 border-gray-600"></div>
+      </div>
+      </div>
+      )}
       </div>
       );
     }
@@ -157,6 +177,9 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
 
   const findMessageIndex = (message_id: string) => {
     const index = post.messages.findIndex((message: MessageType) => message._id === message_id);
+    if(index === -1){
+      return 0;
+    }
     return index;
   };
 
