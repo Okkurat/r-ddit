@@ -1,6 +1,6 @@
 'use client';
 import { findMessage } from "@/app/actions";
-import { useMessageContext } from "@/context/MessageContext";
+import { useMessageContext } from "@/lib/MessageContext";
 import { Message as MessageType, Post, Reply} from '@/lib/types';
 import React, { useState } from "react";
 

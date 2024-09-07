@@ -1,7 +1,7 @@
 'use client';
 import { Post as PostType } from '@/lib/types';
 import ReplyForm from './ReplyForm';
-import { MessageProvider } from '@/context/MessageContext';
+import { MessageProvider } from '@/lib/MessageContext';
 import Post from './Post';
 
 interface Params {

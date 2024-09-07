@@ -1,4 +1,3 @@
-import { useMessageContext } from "@/context/MessageContext";
 import Replies from "./Replies";
 import MessageComp from "./MessageComp";
 import { Post as PostType, Reply } from '@/lib/types';
