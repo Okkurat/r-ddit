@@ -1,10 +1,3 @@
-import { Types } from "mongoose";
-
-export interface PostProps {
-  title?: string;
-  message: string;
-  topic: TopicType
-}
 export interface TopicType {
   name: string
 }
@@ -14,16 +7,12 @@ export interface NewPostData {
   title?: string;
 }
 
-export interface Message {
-  author: any;
-  _id: string;
-  timestamp: string;
-  content: string;
-  replies: Reply[]
-}
 export interface Reply {
-  id: string;
+  _id: string;
   content: string
+  timestamp: string;
+  author: string;
+  replies: Reply[];
 }
 
 export interface PostData {
@@ -37,51 +26,35 @@ export interface MessageData {
 }
 
 export interface Post {
-  id?: string;
+  _id: string;
   title: string;
   message: Message;
   author: string;
-  messages: Message[];
+  messages: Message[]
   timestamp: string;
   latestPost: Date;
 }
-
+export interface PostPlain {
+  _id: string;
+  title: string;
+  message: MessageWithoutReplies;
+  author: string;
+  messages: MessageWithoutReplies[];
+  timestamp: string;
+  latestPost: Date;
+}
 export interface TopicSummary {
   id: string;
   name: string;
-  posts: PostSummary[]
+  posts: PostPlain[];
 }
 
-export interface PostSummary {
-  id: string;
-  title: string;
-  message: MessageSummary;
-  author: string;
-  messages: Message[]
-  timestamp: string
-  latestPost: Date;
-}
-
-export interface MessageSummary {
+export interface Message {
+  _id: string;
   content: string;
   author: string;
+  timestamp: string;
+  replies: Reply[];
 }
 
-export interface PopulatedPost {
-  _id: Types.ObjectId;
-  title: string;
-  message: {
-    content: string;
-    author: string;
-  };
-  author: string;
-  messages: Message[];
-  timestamp: Date;
-  latestPost: Date;
-}
-
-export interface PopulatedTopic {
-  _id: Types.ObjectId;
-  name: string;
-  posts: PopulatedPost[];
-}
+export type MessageWithoutReplies = Omit<Message, 'replies'>;
