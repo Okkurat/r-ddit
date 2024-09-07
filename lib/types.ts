@@ -4,7 +4,7 @@ export interface TopicType {
 export interface NewPostData {
   message: string;
   author: string;
-  title?: string;
+  title: string;
 }
 
 export interface Reply {

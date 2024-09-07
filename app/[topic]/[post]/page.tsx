@@ -51,6 +51,8 @@ const PostPage = async ({ params }: { params: Params }) => {
 
   if (!post) return <div className="bg-black text-gray-400 p-4">Post does not exist</div>;
 
+  
+
   post.timestamp = (new Date(post.timestamp)).toLocaleString();
   post.messages.map((message: MessageType) => {
     message.timestamp = (new Date(message.timestamp)).toLocaleString();

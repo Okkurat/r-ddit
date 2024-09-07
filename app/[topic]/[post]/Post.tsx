@@ -1,11 +1,6 @@
 import Replies from "./Replies";
 import MessageComp from "./MessageComp";
-import { Post as PostType, Reply } from '@/lib/types';
-
-interface Params {
-  post: string;
-  topic: string;
-}
+import { Post as PostType } from '@/lib/types';
 
 interface PostMainProps {
   post: PostType;

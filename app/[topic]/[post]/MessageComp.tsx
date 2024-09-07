@@ -16,6 +16,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [showDiv, setShowDiv] = useState(false);
+  const { value, setValue } = useMessageContext();
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     const x = event.pageX;
@@ -66,7 +67,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     }
   };
   
-  const { value, setValue } = useMessageContext();
+  
   const handleClick = (message_id: string) => {
     if (value.trim() === '') {
       setValue(`>>${message_id}\n`);
@@ -111,7 +112,6 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
         </p>
         {showDiv && renderDiv(message_id)}
       </div>
-
     );
     }
   };
@@ -174,6 +174,9 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
         <div className="pl-4 border-l-2 border-red-500">
         {message.replies.map((reply: Reply) => {
           const indexInMessages = findMessageIndex(reply._id);
+          reply.replies.map((reply: Reply) => {
+            console.log(reply);
+          });
           return (
             <MessageComp
               post={post}
@@ -215,6 +218,11 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
         <div className="pl-4 border-l-2 border-red-500">
         {message.replies.map((reply: Reply) => {
           const indexInMessages = findMessageIndex(reply._id);
+          reply.replies.map((reply: Reply) => {
+            console.log(reply);
+            // NOT POPULATED :D
+            // LEARN TO USE findMessage PLS
+          });
           return (
             <MessageComp
               post={post}
