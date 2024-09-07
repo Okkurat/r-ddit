@@ -7,7 +7,7 @@ import Topic from "@/models/topic";
 import { MessageData, PostData, PostProps } from "@/types/types";
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { string, z } from "zod";
+import { z } from "zod";
 
 export async function createTopic(prevState: unknown, formData: FormData) {
   try {
