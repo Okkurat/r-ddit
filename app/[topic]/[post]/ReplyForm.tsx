@@ -9,16 +9,22 @@ interface Params {
 }
 
 const ReplyForm: FC<Params> = ({ topic, post }) => {
-  const [message, setMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { value, setValue} = useMessageContext();
+  const formRef = useRef<HTMLDivElement>(null);
+  const { value, setValue } = useMessageContext();
+
   useEffect(() => {
     if (textareaRef.current) {
       const textarea = textareaRef.current;
       textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+
+    // Scroll the form container into view
+    if (formRef.current && value !== '') {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [value]);
 
@@ -49,7 +55,7 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
   };
 
   return (
-    <div>
+    <div ref={formRef}>
       <h2 className="text-2xl font-bold mb-4">Create a New Reply</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
