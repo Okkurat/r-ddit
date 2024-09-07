@@ -9,22 +9,10 @@ interface Params {
 }
 
 interface PostMainProps {
-  params: Params;
   post: PostType;
 }
 
-const Post = ({ params, post }: PostMainProps) => {
-  const { value, setValue} = useMessageContext();
-  const handleClick = (message_id: string) => {
-    if(value.trim() === ''){
-      setValue(`>>${message_id}\n`);
-    }
-    else{
-      setValue(`${value}\n>>${message_id}\n`);
-    }
-  };
-  console.log('POST', post);
-
+const Post = ({ post }: PostMainProps) => {
   return (
     <div className='bg-[#1A1A1A] p-4 rounded-lg'>
     <MessageComp post={post} messages={post.messages} message={post.message} index={0} key={post.message._id} isOP={true}></MessageComp>

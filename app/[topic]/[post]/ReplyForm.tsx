@@ -21,8 +21,6 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
       textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
-
-    // Scroll the form container into view
     if (formRef.current && value !== '') {
       formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
