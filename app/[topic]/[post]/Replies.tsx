@@ -1,10 +1,10 @@
-import { Message } from "@/types/types";
+import { Message, Post } from "@/types/types";
 import React from "react";
 import MessageComp from "./MessageComp";
 
 interface RepliesProps {
   messages: Message[];
-  post: any;
+  post: Post;
 }
 
 const Replies = ({ post, messages }: RepliesProps) => {

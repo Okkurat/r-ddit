@@ -1,13 +1,13 @@
 'use client';
 import { findMessage } from "@/app/actions";
 import { useMessageContext } from "@/context/MessageContext";
-import { Message as MessageType} from "@/types/types";
+import { Message as MessageType, Post, Reply} from "@/types/types";
 import React, { useState } from "react";
 
 interface RepliesProps {
   messages: MessageType[];
   message: MessageType;
-  post: any;
+  post: Post;
   index: number;
   isOP: boolean;
 }
@@ -50,13 +50,6 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
   };
 
   const findMessageById = (message_id: string) => {
-    if (post.message_id === message_id) {
-      return (
-        <div className="inline bg-white text-black">
-          {post.content}
-        </div>
-      );
-    }
   const message = messages.find((msg) => msg._id === message_id);
     if (message) {
       return (
@@ -130,11 +123,9 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     return parts;
   };
 
-  //console.log(message.replies);
-  //console.log(post.message.replies);
   const findMessageIndex = (message_id: string) => {
-    const index = post.messages.findIndex((message: any) => message._id === message_id);
-    console.log(index); // Debugging
+    const index = post.messages.findIndex((message: MessageType) => message._id === message_id);
+    console.log(index);
     return index;
   };
 
@@ -150,7 +141,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
         {message.replies.length > 0 && <button onClick={() => setShow(!show)} className="mb-2 ml-auto bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600">{post.message.replies.length}</button>}
         {show && (
         <div className="pl-4 border-l-2 border-red-500">
-        {message.replies.map((reply: any) => {
+        {message.replies.map((reply: Reply) => {
           const indexInMessages = findMessageIndex(reply._id);
           return (
             <MessageComp
@@ -191,7 +182,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
       </div>
       {show && (
         <div className="pl-4 border-l-2 border-red-500">
-        {message.replies.map((reply: any) => {
+        {message.replies.map((reply: Reply) => {
           const indexInMessages = findMessageIndex(reply._id);
           return (
             <MessageComp

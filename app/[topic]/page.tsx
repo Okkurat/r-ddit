@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { fetchTopicData } from '../server-actions';
 import PostForm from './PostForm';
 import { currentUser } from '@clerk/nextjs/server';
-import { Message, Post } from '@/types/types';
+import { PostPlain, TopicSummary } from '@/types/types';
 
 interface Params {
   topic: string
@@ -21,12 +21,12 @@ const TopicPage = async ({ params }: { params: Params }) => {
     return <div className="text-red-500">Error fetching topic. Please try again later.</div>;
   }
 
-  const topic: any = response;
+  const topic: TopicSummary | null = response;
   if (!topic) return <div className="text-gray-400">Topic does not exist</div>;
-  topic.posts.sort((a: Post, b: Post) => {
+  topic.posts.sort((a: PostPlain, b: PostPlain) => {
     return b.latestPost.getTime()- a.latestPost.getTime();
   });
-  
+  console.log("TOPIC IN TOPIC PAGE", topic);
   return (
     <div className="max-w-7xl mx-auto p-4 bg-black text-gray-200">
       <div className="mb-8">
@@ -35,8 +35,8 @@ const TopicPage = async ({ params }: { params: Params }) => {
       </div>
       <div className="grid grid-cols-4 gap-2">
         {topic.posts.length > 0 ? (
-          topic.posts.map((post: Post) => (
-            <Link key={post.id} href={`/${topic.name}/${post.id}`} passHref>
+          topic.posts.map((post: PostPlain) => (
+            <Link key={post._id} href={`/${topic.name}/${post._id}`} passHref>
               <div
                 className={`bg-[#2A2A2A] shadow-md rounded-lg p-3 h-40 overflow-hidden ${
                   user.id === post.author ? 'border-t-2 border-blue-500' : ''

@@ -1,7 +1,7 @@
 import Post from '@/models/post';
 import connectDB from '@/lib/mongoose';
 import Message from '@/models/message';
-import { Message as MessageType, Post as PostType } from '@/types/types';
+import { Message as MessageType, Post as PostType, Reply } from '@/types/types';
 import PostMain from './PostMain';
 import React from "react";
 
@@ -34,6 +34,7 @@ const PostPage = async ({ params }: { params: Params }) => {
     .lean<PostType>()
     .exec();
     if(post){
+      console.log("POST IN POST PAGE", post);
       const messageIds = new Set(post.messages.map(m => m._id.toString()));
       if(post.message && post.message.replies){
         post.message.replies = post.message.replies.filter(reply => messageIds.has(reply._id.toString()));
@@ -55,12 +56,12 @@ const PostPage = async ({ params }: { params: Params }) => {
     message.timestamp = (new Date(message.timestamp)).toLocaleString();
     return message;
   });
-  post.message.replies.map((reply: any) => {
+  post.message.replies.map((reply: Reply) => {
     reply.timestamp = (new Date(reply.timestamp)).toLocaleString();
     return reply;
   });
   post.messages.map((message: MessageType) => {
-    message.replies.map((reply: any) => {
+    message.replies.map((reply: Reply) => {
       reply.timestamp = (new Date(reply.timestamp)).toLocaleString();
       return reply;
     });

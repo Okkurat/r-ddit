@@ -4,7 +4,7 @@ import connectDB from "@/lib/mongoose";
 import Message from "@/models/message";
 import Post from "@/models/post";
 import Topic from "@/models/topic";
-import { MessageData, PostData, PostProps } from "@/types/types";
+import { MessageData, PostData, TopicType } from "@/types/types";
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -78,12 +78,12 @@ export async function createMessage(props: MessageProps){
       author: user.id
     };
     const newMessage = new Message(newMessageData);
-    const post: any = await Post.findById(props.post).populate('message', '', Message);
+    const post = await Post.findById(props.post).populate('message', '', Message);
     if(!post){
       return { error: 'Post not found' };
     }
-
-    post.messages.push(newMessage._id);
+    
+    post.messages.push(newMessage._id as any);
     post.latestPost = newMessage.timestamp;
     await post.save();
     await newMessage.save();
@@ -140,7 +140,11 @@ export async function findMessage(message_id: string) {
     }
   }
 };
-
+interface PostProps {
+  title?: string;
+  message: string;
+  topic: TopicType
+}
 export async function createPost(props: PostProps) {
 
   try {

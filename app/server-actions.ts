@@ -2,7 +2,7 @@ import connectDB from "@/lib/mongoose";
 import Topic from "@/models/topic";
 import Post from "@/models/post";
 import Message from "@/models/message";
-import { PopulatedPost, PopulatedTopic, TopicSummary } from "@/types/types";
+import { MessageWithoutReplies, TopicSummary, PostPlain } from "@/types/types";
 import { currentUser } from "@clerk/nextjs/server";
 
 export async function fetchTopicData(topicName: string): Promise<TopicSummary | { error: string }> {
@@ -14,20 +14,18 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
 
     await connectDB();
     const topic = await Topic.findOne({ name: topicName })
-    .populate<PopulatedTopic>({
+    .populate<TopicSummary>({
       path: 'posts',
       model: Post,
       select: 'title message author messages timestamp latestPost',
       populate: [
         {
           path: 'message',
-          model: Message,
-          select: 'content author -_id'
+          model: Message
         },
         {
           path: 'messages',
-          model: Message,
-          select: 'content author -_id'
+          model: Message
         }
       ]
     })
@@ -40,21 +38,29 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
     }
     console.log("TOPIC", topic);
     const topicSummary: TopicSummary = {
-      id: topic._id.toString(),
+      id: topic._id?.toString(),
       name: topic.name,
-      posts: topic.posts.map((post: PopulatedPost) => ({
-        id: post._id.toString(),
+      posts: topic.posts.map((post: PostPlain) => ({
+        _id: post._id?.toString(),
         title: post.title,
         message: {
+          _id: post.message._id,
           content: post.message.content,
-          author: post.message.author
+          author: post.message.author,
+          timestamp: post.message.timestamp
         },
         author: post.author,
-        messages: post.messages,
-        timestamp: post.timestamp.toISOString(),
-        latestPost: post.latestPost
-      }))
+        messages: post.messages.map((message: MessageWithoutReplies) => ({
+          _id: message._id?.toString(),
+          content: message.content,
+          author: message.author,
+          timestamp: message.timestamp
+        })),
+        timestamp: post.timestamp,
+        latestPost: post.latestPost,
+      })),
     };
+
     return topicSummary;
   } catch (error: unknown) {
     if (error instanceof Error) {
