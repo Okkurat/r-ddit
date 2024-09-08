@@ -6,7 +6,6 @@ import Post from "@/models/post";
 import Topic from "@/models/topic";
 import { MessageData, PostData, TopicType } from '@/lib/types';
 import { currentUser } from "@clerk/nextjs/server";
-import { ConnectionStates } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -141,6 +140,7 @@ export async function findMessage(message_id: string) {
     }
   }
 };
+
 interface PostProps {
   title?: string;
   message: string;
