@@ -2,7 +2,8 @@
 import { findMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
 import { Message as MessageType, Post, Reply} from '@/lib/types';
-import React, { useState } from "react";
+import { set } from "mongoose";
+import React, { useEffect, useState } from "react";
 
 interface RepliesProps {
   messages: MessageType[];
@@ -17,7 +18,19 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [showDiv, setShowDiv] = useState(false);
   const { value, setValue } = useMessageContext();
+  const [isLoading, setIsLoading] = useState(false);
+  const [divIsLoading, setDivIsLoading] = useState(true);
+  const [currentID, setCurrentID] = useState<string>('');
+  const [pointedPost, setPointedPost] = useState<MessageType | null>(null);
+  const [replyMessages, setReplyMessages] = useState<MessageType[]>([]);
 
+  const handleMouseMoveV2 = (event: React.MouseEvent<HTMLDivElement>, messageId : string) => {
+    const x = event.pageX;
+    const y = event.pageY;
+    setPosition({ x, y });
+    setCurrentID(messageId);
+    setShowDiv(true);
+  };
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     const x = event.pageX;
     const y = event.pageY;
@@ -30,6 +43,64 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
   const handleMouseLeave = () => {
     setShowDiv(false);
   };
+
+  const fetchReplyMessage = async (replyId: string) => {
+    // handle errors more better here pls
+    setIsLoading(true);
+    try {
+      const { message, error } = await findMessage(replyId);
+      if (error) {
+        return null;
+      }
+      message.timestamp = (new Date(message.timestamp)).toLocaleString();
+      return message;
+    } catch (error) {
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setDivIsLoading(true);
+    if(!showDiv){
+      return;
+    }
+    const fetchMessage = async () => {
+      try {
+        const { message, error } = await findMessage(currentID);
+        if (error) {
+          return null;
+        }
+        setPointedPost(message);
+        return message;
+      } catch (error) {
+        return null;
+      } finally {
+        console.log(pointedPost?._id);
+        setDivIsLoading(false);
+      }
+    };
+  
+    fetchMessage();
+  }, [showDiv]);
+
+  useEffect(() => {
+    if (show && message.replies.length > 0) {
+      const fetchReplies = async () => {
+        const fetchedReplies = await Promise.all(
+          message.replies.map(async (reply: Reply | string) => {
+            if (typeof reply === 'string') {
+              return await fetchReplyMessage(reply);
+            }
+            return reply;
+          })
+        );
+        setReplyMessages(fetchedReplies.filter(reply => reply !== null));
+      };
+      fetchReplies();
+    }
+  }, [show, message.replies]);
 
   const isElementInViewport = (message_id: string): boolean => {
     const element = document.getElementById(message_id);
@@ -44,18 +115,6 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     }
     return false;
   };
-
-  const renderDiv = (message_id: string): JSX.Element => (
-    <div
-    className="absolute bg-[#2A2A2A] p-2 rounded pointer-events-none max-w-[70%]"
-    style={{
-      top: `${position.y + 10}px`,
-      left: `${position.x + 10}px`,
-      }}
-    >
-      Put the message here {message_id}
-    </div>
-  );
   
 
   const scrollToMessage = (message_id: string): void => {
@@ -124,13 +183,36 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
       return (
         <div className="block">
         <p
-          onMouseMove={handleMouseMove}
+          onMouseMove={(e) => handleMouseMoveV2(e, message_id)}
           onMouseLeave={handleMouseLeave}
           className="inline-block text-blue-500"
         >
-          {">>"}{message_id}
+          {">>>"}{"post"}
+          
         </p>
-        {showDiv && renderDiv(message_id)}
+        {showDiv ? (
+          divIsLoading && pointedPost ? (
+            null
+          ) : (
+            (
+              <div
+              className="absolute bg-[#2A2A2A] p-2 rounded pointer-events-none max-w-[70%]"
+              style={{
+                top: `${position.y + 10}px`,
+                left: `${position.x + 10}px`,
+                }}
+              >
+            <div className="relative bg-[#2A2A2A] rounded-lg flex-col gap-2">
+            <div className="flex flex-col gap-0 mb-0">
+                <p className="font-semibold">1. {pointedPost?.timestamp ? pointedPost.timestamp : 'No timestamp'}</p>
+              </div>
+              {pointedPost?.content ? <div>{parseIndepMessage(pointedPost.content)} </div> : null}
+            <div className=" border-l-2 border-gray-600"></div>
+          </div>
+          </div>
+          )
+          )
+        ) : null}
       </div>
     );
     }
@@ -196,31 +278,32 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
         {message.replies.length > 0 && <button onClick={() => setShow(!show)} className="mb-2 ml-auto bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600">{post.message.replies.length}</button>}
         {show && (
         <div className="pl-4 border-l-2 border-red-500">
-        {message.replies.map((reply: Reply) => {
-          const indexInMessages = findMessageIndex(reply._id);
-          reply.replies.map((reply: Reply) => {
-            console.log(reply);
-          });
-          return (
-            <MessageComp
-              post={post}
-              messages={messages}
-              message={reply}
-              index={indexInMessages}
-              key={reply._id}
-              isOP={false}
-              />
+          {isLoading ? (
+            <p>Loading replies...</p>
+          ) : (
+            replyMessages.map((reply: MessageType) => {
+              const indexInMessages = findMessageIndex(reply._id);
+              return (
+                <MessageComp
+                  post={post}
+                  messages={messages}
+                  message={reply}
+                  index={indexInMessages}
+                  key={reply._id}
+                  isOP={false}
+                />
               );
-            })}
-            <button className="w-full bg-red-700 text-white py-2 px-4 rounded hover:bg-red-800"
-              onClick={() => {
-                setShow(!show)
-                scrollToMessage(post.message._id)
-              }
-            }
-            >
-              Hide
-            </button>
+            })
+          )}
+          <button
+            className="w-full bg-red-700 text-white py-2 px-4 rounded hover:bg-red-800"
+            onClick={() => {
+              setShow(!show);
+              scrollToMessage(message._id);
+            }}
+          >
+            Hide
+          </button>
         </div>
       )}
       </div>
@@ -240,33 +323,32 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
       </div>
       {show && (
         <div className="pl-4 border-l-2 border-red-500">
-        {message.replies.map((reply: Reply) => {
-          const indexInMessages = findMessageIndex(reply._id);
-          reply.replies.map((reply: Reply) => {
-            console.log(reply);
-            // NOT POPULATED :D
-            // LEARN TO USE findMessage PLS
-          });
-          return (
-            <MessageComp
-              post={post}
-              messages={messages}
-              message={reply}
-              index={indexInMessages}
-              key={reply._id}
-              isOP={false}
-              />
+          {isLoading ? (
+            <p>Loading replies...</p>
+          ) : (
+            replyMessages.map((reply: MessageType) => {
+              const indexInMessages = findMessageIndex(reply._id);
+              return (
+                <MessageComp
+                  post={post}
+                  messages={messages}
+                  message={reply}
+                  index={indexInMessages}
+                  key={reply._id}
+                  isOP={false}
+                />
               );
-            })}
-            <button className="w-full bg-red-700 text-white py-2 px-4 rounded hover:bg-red-800"
-              onClick={() => {
-                setShow(!show)
-                scrollToMessage(message._id)
-              }
-            }
-            >
-              Hide
-            </button>
+            })
+          )}
+          <button
+            className="w-full bg-red-700 text-white py-2 px-4 rounded hover:bg-red-800"
+            onClick={() => {
+              setShow(!show);
+              scrollToMessage(message._id);
+            }}
+          >
+            Hide
+          </button>
         </div>
       )}
       </div>

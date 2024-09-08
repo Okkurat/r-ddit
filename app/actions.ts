@@ -123,7 +123,7 @@ export async function findMessage(message_id: string) {
       return { error: 'User does not exist' };
     }
     await connectDB();
-    const message = await Message.findById(message_id);
+    const message = await Message.findById(message_id).populate('replies').lean().exec();
     if (!message) {
       return { error: 'Message not found' };
     }
