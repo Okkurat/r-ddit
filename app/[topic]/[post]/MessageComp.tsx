@@ -2,7 +2,6 @@
 import { findMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
 import { Message as MessageType, Post, Reply} from '@/lib/types';
-import { set } from "mongoose";
 import React, { useEffect, useState } from "react";
 
 interface RepliesProps {
@@ -21,20 +20,14 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
   const [isLoading, setIsLoading] = useState(false);
   const [divIsLoading, setDivIsLoading] = useState(true);
   const [currentID, setCurrentID] = useState<string>('');
-  const [pointedPost, setPointedPost] = useState<MessageType | null>(null);
+  const [pointedPost, setPointedPost] = useState<any>(null);
   const [replyMessages, setReplyMessages] = useState<MessageType[]>([]);
 
-  const handleMouseMoveV2 = (event: React.MouseEvent<HTMLDivElement>, messageId : string) => {
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>, messageId : string) => {
     const x = event.pageX;
     const y = event.pageY;
     setPosition({ x, y });
     setCurrentID(messageId);
-    setShowDiv(true);
-  };
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    const x = event.pageX;
-    const y = event.pageY;
-    setPosition({ x, y });
     setShowDiv(true);
   };
 
@@ -63,7 +56,11 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
 
   useEffect(() => {
     setDivIsLoading(true);
-    if(!showDiv){
+    if(!showDiv || currentID === ''){
+      return;
+    }
+    if(currentID === pointedPost?._id){
+      setDivIsLoading(false);
       return;
     }
     const fetchMessage = async () => {
@@ -72,6 +69,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
         if (error) {
           return null;
         }
+        console.log(message);
         setPointedPost(message);
         return message;
       } catch (error) {
@@ -83,7 +81,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     };
   
     fetchMessage();
-  }, [showDiv]);
+  }, [currentID, pointedPost?._id, showDiv]);
 
   useEffect(() => {
     if (show && message.replies.length > 0) {
@@ -153,7 +151,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
         <div className="block">
         <p
           onClick={() => scrollToMessage(message_id)}
-          onMouseMove={handleMouseMove}
+          onMouseMove={(e) => handleMouseMove(e, '')}
           onMouseLeave={handleMouseLeave}
           className="inline-block text-blue-500"
         >
@@ -183,7 +181,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
       return (
         <div className="block">
         <p
-          onMouseMove={(e) => handleMouseMoveV2(e, message_id)}
+          onMouseMove={(e) => handleMouseMove(e, message_id)}
           onMouseLeave={handleMouseLeave}
           className="inline-block text-blue-500"
         >
