@@ -8,7 +8,7 @@ interface PostMainProps {
 
 const Post = ({ post }: PostMainProps) => {
   return (
-    <div className="bg-[#1A1A1A] rounded-lg border-l-2 border-gray-500">
+    <div className="bg-[#1A1A1A] rounded-lg border-2 border-gray-500">
     <div className="p-2">
     <MessageComp post={post} messages={post.messages} message={post.message} index={0} key={post.message._id} isOP={true}></MessageComp>
     </div>

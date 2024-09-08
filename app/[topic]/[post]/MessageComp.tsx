@@ -74,7 +74,6 @@ const MessageComp = ({ post, messages, message, index, isOP, isTopLevel = true }
           console.log(error);
           return null;
         }
-        console.log(message, post, topic);
         message.timestamp = (new Date(message.timestamp)).toLocaleString('en-US');
         setPointedPost(message);
         setPostId(post || '');
@@ -313,7 +312,6 @@ const MessageComp = ({ post, messages, message, index, isOP, isTopLevel = true }
           ) : (
             replyMessages.map((reply: MessageType) => {
               const indexInMessages = findMessageIndex(reply._id);
-              console.log(isTopLevel);
               return (
                 <MessageComp
                   post={post}
