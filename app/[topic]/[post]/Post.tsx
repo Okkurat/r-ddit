@@ -1,19 +1,23 @@
 import Replies from "./Replies";
 import MessageComp from "./MessageComp";
 import { Post as PostType } from '@/lib/types';
+import ReplyForm from "./ReplyForm";
+
 
 interface PostMainProps {
   post: PostType;
+  topic: string;
 }
 
-const Post = ({ post }: PostMainProps) => {
+const Post = ({ post, topic }: PostMainProps) => {
   return (
-    <div className="bg-[#1A1A1A] rounded-lg border-2 border-gray-500">
-    <div className="p-2">
+    <div className="bg-[#121212] rounded-lg border-2 border-[#242424]">
+    <div className="">
     <MessageComp post={post} messages={post.messages} message={post.message} index={0} key={post.message._id} isOP={true}></MessageComp>
     </div>
-      <div className="pt-4 pl-4 pr-4">
+      <div className="bg-[#121212] p-2">
       <Replies post={post} messages={post.messages}></Replies>
+      <ReplyForm topic={topic} post={post.title}></ReplyForm>
       </div>
   </div>
   );

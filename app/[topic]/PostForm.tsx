@@ -53,41 +53,40 @@ const PostForm = (props: PostFormProps) => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Create a New Post</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1">
-            Title:
           </label>
           <input
             id="title"
             type="text"
             value={title}
+            placeholder="Write your title here..."
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-dark-blue-800 text-gray-700"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-[#0D0D0D] text-[#CCCCCC] focus:outline-none focus:ring-2 focus:ring-blue-800 overflow-hidden"
           />
         </div>
         <div>
           <label htmlFor="message" className="block text-sm font-medium mb-1">
-            Message:
           </label>
           <textarea
             id="message"
             ref={textareaRef}
+            placeholder="Write your message here..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             required
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-dark-blue-800 overflow-hidden text-gray-700"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-[#0D0D0D] text-[#CCCCCC] focus:outline-none focus:ring-2 focus:ring-blue-800 overflow-hidden"
             style={{ resize: 'none' }}
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className={`w-full px-4 py-2 text-white font-semibold rounded-md shadow-sm ${
-            loading ? 'bg-gray-400' : 'bg-blue-700 hover:bg-blue-800'
-          } focus:outline-none focus:ring-2 focus:ring-blue-800`}
+          className={`w-full py-2 text-[#CCCCCC] font-semibold rounded-md shadow-sm ${
+            loading ? 'bg-gray-400' : 'bg-[#242424] hover:bg-[#3E3F3E]'
+          } focus:outline-none focus:ring-2 hover:bg-[#3E3F3E]`}
         >
           {loading ? 'Posting...' : 'Post'}
         </button>

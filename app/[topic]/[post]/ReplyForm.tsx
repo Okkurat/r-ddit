@@ -1,6 +1,7 @@
 'use client';
 import { createMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
+import { set } from "mongoose";
 import { FormEvent, useState, useRef, useEffect, FC } from "react";
 
 interface Params {
@@ -26,10 +27,23 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
     }
   }, [value]);
 
+  useEffect(() => {
+    if (error) {
+      setTimeout(() => {
+        setError(null);
+      }, 5000);
+    }
+  }, [error]);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
+    if(value.trim() === ''){
+      setError('Message cannot be empty');
+      setLoading(false);
+      return;
+    }
     const regex = />>(\w{24})/g;
     const matches = value.match(regex) || [];
 
@@ -54,29 +68,28 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
 
   return (
     <div ref={formRef}>
-      <h2 className="text-2xl font-bold mb-4">Create a New Reply</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="message" className="block text-sm font-medium mb-1">
-            Message:
           </label>
           <textarea
             id="message"
             ref={textareaRef}
+            placeholder="Write your message here..."
             value={value}
             onChange={(e) => setValue(e.target.value)}
             required
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 bg-gray-150 overflow-hidden text-gray-700"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-[#0D0D0D] text-[#CCCCCC] focus:outline-none focus:ring-2 focus:ring-blue-800 overflow-hidden"
             style={{ resize: 'none' }}
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className={`w-full px-4 py-2 text-white font-semibold rounded-md shadow-sm ${
-            loading ? 'bg-gray-400' : 'bg-blue-700 hover:bg-blue-800'
-          } focus:outline-none focus:ring-2 focus:ring-blue-800`}
+          className={`w-full py-2 text-[#CCCCCC] font-semibold rounded-md shadow-sm ${
+            loading ? 'bg-gray-400' : 'bg-[#242424] hover:bg-[#3E3F3E]'
+          } focus:outline-none focus:ring-2 hover:bg-[#3E3F3E]`}
         >
           {loading ? 'Posting...' : 'Post'}
         </button>

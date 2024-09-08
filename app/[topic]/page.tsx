@@ -27,9 +27,8 @@ const TopicPage = async ({ params }: { params: Params }) => {
   topic.posts.sort((a: PostPlain, b: PostPlain) => {
     return b.latestPost.getTime()- a.latestPost.getTime();
   });
-  console.log("TOPIC IN TOPIC PAGE", topic);
   return (
-    <div className="max-w-7xl mx-auto p-4 bg-black text-gray-200">
+    <div className="max-w-7xl mx-auto p-4 bg-[#121212] text-[#CCCCCC] rounded-lg border-2 border-[#242424]">
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-4">This is the {params.topic} topic</h1>
         <PostForm topic={params.topic} />
@@ -39,13 +38,13 @@ const TopicPage = async ({ params }: { params: Params }) => {
           topic.posts.map((post: PostPlain) => (
             <Link key={post._id} href={`/${topic.name}/${post._id}`} passHref>
               <div
-                className={`bg-[#2A2A2A] shadow-md rounded-lg p-3 h-40 overflow-hidden ${
+                className={`bg-[#171717] shadow-md rounded-lg p-3 h-40 overflow-hidden ${
                   user.id === post.author ? 'border-t-2 border-blue-500' : ''
                 }`}
               >
-                <h2 className="text-sm text-gray-200 font-semibold mb-1 truncate">{post.title || 'Untitled'}</h2>
-                <p className="text-xs text-gray-300 mb-1 line-clamp-3">{post.message.content}</p>
-                <small className="text-xs text-gray-400">Posts: {post.messages.length}</small>
+                <h2 className="text-sm text-[#CCCCCC] font-semibold mb-1 truncate">{post.title || 'Untitled'}</h2>
+                <p className="text-xs text-[#CCCCCC] mb-1 line-clamp-3">{post.message.content}</p>
+                <small className="text-xs text-gray-300">Posts: {post.messages.length}</small>
               </div>
             </Link>
           ))

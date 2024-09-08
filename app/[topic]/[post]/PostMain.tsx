@@ -1,6 +1,5 @@
 'use client';
 import { Post as PostType } from '@/lib/types';
-import ReplyForm from './ReplyForm';
 import { MessageProvider } from '@/lib/MessageContext';
 import Post from './Post';
 
@@ -19,8 +18,7 @@ const PostMain = ({ params, post }: PostMainProps) => {
   return (
     <MessageProvider>
     <div className="max-w-7xl mx-auto p-4">
-      <Post post={post}></Post>
-      <ReplyForm topic={params.topic} post={params.post}></ReplyForm>
+      <Post post={post} topic={params.topic}></Post>
     </div>
     </MessageProvider>
   );

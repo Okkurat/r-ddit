@@ -42,7 +42,7 @@ const RootLayout = async (props: RootLayoutProps) => {
           <SignedIn>
             <header>
               <div className="flex-col gap-4">
-                <nav className="bg-[#333333] flex w-full items-center justify-between border-b p-4 text-xl font-semibold">
+                <nav className="bg-[#2C2C32] flex w-full items-center justify-between border-b p-4 text-xl font-semibold">
                   <Link href="/" className="text-white hover:underline">
                     <h1 className="text-2xl font-bold text-white" style={{
                       textShadow: `-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000`
@@ -51,7 +51,7 @@ const RootLayout = async (props: RootLayoutProps) => {
                     </h1>
                   </Link>
                   {topics.map((topic) => (
-                    <Link key={topic.id} href={`/${topic.name}`} className="text-white hover:underline">
+                    <Link key={topic.id} href={`/${topic.name}`} className="text-[#C6C6D9] hover:underline">
                       {topic.name}
                     </Link>
                   ))}
