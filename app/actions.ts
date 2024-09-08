@@ -140,6 +140,50 @@ export async function findMessage(message_id: string) {
     }
   }
 };
+export async function fetchMessageWithPostAndTopic(messageId: string) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { error: 'User does not exist' };
+    }
+    
+    await connectDB();
+    
+    const message = await Message.findById(messageId).exec();
+    if (!message) {
+      return { error: 'Message not found' };
+    }
+    let post;
+    post = await Post.findOne({ messages: message._id }).exec();
+    if(!post){
+      post = await Post.findOne({ message: message._id }).exec();
+    }
+    if (!post) {
+      return { error: 'Post containing this message not found' };
+    }
+    
+    const topic = await Topic.findOne({ posts: post._id }).exec();
+    if (!topic) {
+      return { error: 'Topic containing this post not found'};
+    }
+    
+    return {
+      message: JSON.parse(JSON.stringify(message)),
+      post: post.id,
+      topic: topic.name, // This will work due to the transformation in your schema
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message || 'Failed to find values'
+      };
+    } else {
+      return {
+        error: 'Unexpected error' || 'Failed to find values'
+      };
+    }
+  }
+}
 
 interface PostProps {
   title?: string;

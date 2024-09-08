@@ -1,5 +1,5 @@
 'use client';
-import { findMessage } from "@/app/actions";
+import { fetchMessageWithPostAndTopic, findMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
 import { Message as MessageType, Post, Reply} from '@/lib/types';
 import Link from "next/link";
@@ -22,6 +22,8 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
   const [divIsLoading, setDivIsLoading] = useState(true);
   const [currentID, setCurrentID] = useState<string>('');
   const [pointedPost, setPointedPost] = useState<any>(null);
+  const [topic, setTopic] = useState<string>('');
+  const [postId, setPostId] = useState<string>('');
   const [replyMessages, setReplyMessages] = useState<MessageType[]>([]);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>, messageId : string) => {
@@ -66,12 +68,16 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     }
     const fetchMessage = async () => {
       try {
-        const { message, error } = await findMessage(currentID);
+        const { message, post, topic, error } = await fetchMessageWithPostAndTopic(currentID);
         if (error) {
+          console.log(error);
           return null;
         }
-        console.log(message);
+        console.log(message, post, topic);
+        message.timestamp = (new Date(message.timestamp)).toLocaleString('en-US');
         setPointedPost(message);
+        setPostId(post || '');
+        setTopic(topic || '');
         return message;
       } catch (error) {
         return null;
@@ -186,10 +192,9 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
           onMouseLeave={handleMouseLeave}
           className="inline-block text-blue-500"
         >
-          <Link href={`/anime/66db854dd355dca502eaca40/#${message_id}`}>
+          <Link href={`/${topic}/${postId}/#${message_id}`}>
           {">>>post"}
           </Link>
-          {"NEED TO FIND THE TOPIC ID AND THREAD ID THEN IT WORKS BEAUTIFULLY"}
 
           
         </p>
