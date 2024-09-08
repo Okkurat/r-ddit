@@ -1,5 +1,5 @@
 import Replies from "./Replies";
-import MessageComp from "./MessageComp";
+import MessageComp from "./Message";
 import { Post as PostType } from '@/lib/types';
 import ReplyForm from "./ReplyForm";
 

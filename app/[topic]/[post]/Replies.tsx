@@ -1,6 +1,6 @@
 import { Message, Post } from '@/lib/types';
 import React from "react";
-import MessageComp from "./MessageComp";
+import MessageComp from "./Message";
 
 interface RepliesProps {
   messages: Message[];

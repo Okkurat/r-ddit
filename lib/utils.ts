@@ -21,3 +21,12 @@ export const isElementInViewport = (message_id: string, document: Document): boo
   }
   return false;
 };
+
+export const scrollToMessage = (messageId: string): void => {
+  if (!isElementInViewport(messageId, document)) {
+    const element = document.getElementById(messageId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+};
