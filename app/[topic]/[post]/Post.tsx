@@ -8,11 +8,13 @@ interface PostMainProps {
 
 const Post = ({ post }: PostMainProps) => {
   return (
-    <div className='bg-[#1A1A1A] p-4 rounded-lg'>
+    <div className="bg-[#1A1A1A] rounded-lg border-l-2 border-gray-500">
+    <div className="p-2">
     <MessageComp post={post} messages={post.messages} message={post.message} index={0} key={post.message._id} isOP={true}></MessageComp>
-    <div className="pl-4 border-l-2 border-gray-500">
-      <Replies post={post} messages={post.messages}></Replies>
     </div>
+      <div className="pt-4 pl-4 pr-4">
+      <Replies post={post} messages={post.messages}></Replies>
+      </div>
   </div>
   );
 };

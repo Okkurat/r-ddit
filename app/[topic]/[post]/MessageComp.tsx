@@ -10,10 +10,11 @@ interface RepliesProps {
   message: MessageType;
   post: Post;
   index: number;
+  isTopLevel?: boolean;
   isOP: boolean;
 }
 
-const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => {
+const MessageComp = ({ post, messages, message, index, isOP, isTopLevel = true }: RepliesProps) => {
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [showDiv, setShowDiv] = useState(false);
@@ -62,7 +63,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     if(!showDiv || currentID === ''){
       return;
     }
-    if(currentID === pointedPost?._id){
+    if(currentID === pointedPost?.id){
       setDivIsLoading(false);
       return;
     }
@@ -82,13 +83,12 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
       } catch (error) {
         return null;
       } finally {
-        console.log(pointedPost?._id);
         setDivIsLoading(false);
       }
     };
   
     fetchMessage();
-  }, [currentID, pointedPost?._id, showDiv]);
+  }, [currentID, pointedPost?.id, showDiv]);
 
   useEffect(() => {
     if (show && message.replies.length > 0) {
@@ -190,13 +190,15 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
         <p
           onMouseMove={(e) => handleMouseMove(e, message_id)}
           onMouseLeave={handleMouseLeave}
-          className="inline-block text-blue-500"
+          className="inline-block text-blue-500 cursor-default"
         >
-          <Link href={`/${topic}/${postId}/#${message_id}`}>
-          {">>>post"}
-          </Link>
-
-          
+          {topic && postId ? (
+            <Link href={`/${topic}/${postId}/#${message_id}`}>
+              {">>>post"}
+            </Link>
+          ) : (
+            <span>{">>>post"}</span>
+          )}
         </p>
         {showDiv ? (
           divIsLoading && pointedPost ? (
@@ -283,37 +285,12 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
           <button onClick={() => handleClick(post.message._id)} className="ml-auto bg-blue-700 text-white py-2 px-4 rounded hover:bg-blue-800">Reply</button>
         </div>
         <div>{splitMessageContent(message.content)}</div>
-        {message.replies.length > 0 && <button onClick={() => setShow(!show)} className="mb-2 ml-auto bg-gray-700 text-white py-2 px-4 rounded hover:bg-gray-600">{post.message.replies.length}</button>}
-        {show && (
-        <div className="pl-4 border-l-2 border-red-500">
-          {isLoading ? (
-            <p>Loading replies...</p>
-          ) : (
-            replyMessages.map((reply: MessageType) => {
-              const indexInMessages = findMessageIndex(reply._id);
-              return (
-                <MessageComp
-                  post={post}
-                  messages={messages}
-                  message={reply}
-                  index={indexInMessages}
-                  key={reply._id}
-                  isOP={false}
-                />
-              );
-            })
-          )}
-          <button
-            className="w-full bg-red-700 text-white py-2 px-4 rounded hover:bg-red-800"
-            onClick={() => {
-              setShow(!show);
-              scrollToMessage(message._id);
-            }}
-          >
-            Hide
-          </button>
-        </div>
-      )}
+        {message.replies.length > 0 ? (
+        <p className="pt-2 text-gray-300">{post.message.replies.length} messages</p>
+        ) : (
+          <p className="pt-2 text-gray-300">No messages</p>
+        )}
+
       </div>
     );
   }
@@ -336,6 +313,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
           ) : (
             replyMessages.map((reply: MessageType) => {
               const indexInMessages = findMessageIndex(reply._id);
+              console.log(isTopLevel);
               return (
                 <MessageComp
                   post={post}
@@ -344,23 +322,26 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
                   index={indexInMessages}
                   key={reply._id}
                   isOP={false}
+                  isTopLevel={false}
                 />
               );
             })
           )}
-          <button
-            className="w-full bg-red-700 text-white py-2 px-4 rounded hover:bg-red-800"
-            onClick={() => {
-              setShow(!show);
-              scrollToMessage(message._id);
-            }}
-          >
-            Hide
-          </button>
+          {isTopLevel && (
+            <button
+              className="w-full bg-red-700 text-white py-2 px-4 rounded hover:bg-red-800"
+              onClick={() => {
+                setShow(!show);
+                scrollToMessage(message._id);
+              }}
+            >
+              Hide
+            </button>
+          )}
         </div>
       )}
       </div>
       );
-    };
+};
 
 export default MessageComp;
