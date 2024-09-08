@@ -45,7 +45,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     return false;
   };
 
-  const renderDiv = (message_id: string) => (
+  const renderDiv = (message_id: string): JSX.Element => (
     <div
     className="absolute bg-[#2A2A2A] p-2 rounded pointer-events-none max-w-[70%]"
     style={{
@@ -58,7 +58,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
   );
   
 
-  const scrollToMessage = (message_id: string) => {
+  const scrollToMessage = (message_id: string): void => {
     if (!isElementInViewport(message_id)) {
       const element = document.getElementById(message_id);
       if (element) {
@@ -68,7 +68,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
   };
   
   
-  const handleClick = (message_id: string) => {
+  const handleClick = (message_id: string): void => {
     if (value.trim() === '') {
       setValue(`>>${message_id}\n`);
     } else {
@@ -76,11 +76,11 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     }
   };
 
-  const findMessageById = (message_id: string) => {
+  const findMessageById = (message_id: string): JSX.Element => {
   const message = messages.find((msg) => msg._id === message_id);
     if (message) {
       return (
-        <div onClick={() => scrollToMessage(message_id)} className="relative bg-[#2A2A2A] pt-2 pb-2 px-2 rounded-lg flex-col gap-2 py-2 border-t border-gray-600 pl-4 border-l-2 border-gray-600">
+        <div onClick={() => scrollToMessage(message_id)} className="relative bg-[#2A2A2A] pt-2 pb-2 px-2 rounded-lg flex-col gap-2 py-2 border-t border-gray-600 pl-3 border-l-2 border-gray-600">
           <div className="flex flex-col gap-0 mb-0">
             <p className="font-semibold mb-0">{message.timestamp ? message.timestamp : 'No timestamp'}</p>
             <div className="mt-0">{parseIndepMessage(message.content)}</div>
@@ -135,19 +135,20 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     );
     }
   };
-  const parseIndepMessage = (message: string) => {
+  const parseIndepMessage = (message: string) : JSX.Element[] => {
     const parts = message.split(/(>>(\w{24})(\s|$|\n))/g);
     return parts.map((part, index) => {
       const match = part.match(/>>(\w{24})/);
       if (match) {
         return <div key={index} className="block text-blue-500">{">>"}post</div>;
       }
-      else {
+      else if (!part.match(/(\w{24})/)) {
         const match = part.match(/(\w{24})/);
         if (!match) {
           return <span key={index}>{part}</span>;
         }
-    }
+      }
+      return <span key={index}></span>;
     });
   };
 
@@ -175,7 +176,7 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
     return parts;
   };
 
-  const findMessageIndex = (message_id: string) => {
+  const findMessageIndex = (message_id: string): number => {
     const index = post.messages.findIndex((message: MessageType) => message._id === message_id);
     if(index === -1){
       return 0;
