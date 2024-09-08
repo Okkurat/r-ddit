@@ -2,6 +2,7 @@
 import { findMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
 import { Message as MessageType, Post, Reply} from '@/lib/types';
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 interface RepliesProps {
@@ -185,7 +186,11 @@ const MessageComp = ({ post, messages, message, index, isOP }: RepliesProps) => 
           onMouseLeave={handleMouseLeave}
           className="inline-block text-blue-500"
         >
-          {">>>"}{"post"}
+          <Link href={`/anime/66db854dd355dca502eaca40/#${message_id}`}>
+          {">>>post"}
+          </Link>
+          {"NEED TO FIND THE TOPIC ID AND THREAD ID THEN IT WORKS BEAUTIFULLY"}
+
           
         </p>
         {showDiv ? (

@@ -9,8 +9,9 @@ interface Params {
 }
 
 const TopicPage = async ({ params }: { params: Params }) => {
-  const response = await fetchTopicData(params.topic);
   const user = await currentUser();
+  const response = await fetchTopicData(params.topic);
+
 
   if (!user) {
     return <div>Error</div>;
