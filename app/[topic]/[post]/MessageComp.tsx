@@ -2,6 +2,7 @@
 import { fetchMessageWithPostAndTopic, findMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
 import { Message as MessageType, Post, Reply} from '@/lib/types';
+import { findMessageIndex, isElementInViewport } from "@/lib/utils";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
@@ -25,6 +26,7 @@ const MessageComp = ({ post, messages, message, index, isOP, isTopLevel = true }
   const [pointedPost, setPointedPost] = useState<any>(null);
   const [topic, setTopic] = useState<string>('');
   const [postId, setPostId] = useState<string>('');
+  const [show, setShow] = useState(false);
   const [replyMessages, setReplyMessages] = useState<MessageType[]>([]);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>, messageId : string) => {
@@ -33,12 +35,6 @@ const MessageComp = ({ post, messages, message, index, isOP, isTopLevel = true }
     setPosition({ x, y });
     setCurrentID(messageId);
     setShowDiv(true);
-  };
-
-  const [show, setShow] = useState(false);
-
-  const handleMouseLeave = () => {
-    setShowDiv(false);
   };
 
   const fetchReplyMessage = async (replyId: string) => {
@@ -109,24 +105,9 @@ const MessageComp = ({ post, messages, message, index, isOP, isTopLevel = true }
       fetchReplies();
     }
   }, [show, message.replies]);
-
-  const isElementInViewport = (message_id: string): boolean => {
-    const element = document.getElementById(message_id);
-    if (element) {
-      const rect = element.getBoundingClientRect();
-      return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-      );
-    }
-    return false;
-  };
   
-
   const scrollToMessage = (message_id: string): void => {
-    if (!isElementInViewport(message_id)) {
+    if (!isElementInViewport(message_id, document)) {
       const element = document.getElementById(message_id);
       if (element) {
         element.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -143,94 +124,94 @@ const MessageComp = ({ post, messages, message, index, isOP, isTopLevel = true }
     }
   };
 
-  const findMessageById = (message_id: string): JSX.Element => {
-  const message = messages.find((msg) => msg._id === message_id);
-    if (message) {
-      const timestamp = message.timestamp = (new Date(message.timestamp)).toLocaleString('en-US');
-      return (
-        <div onClick={() => scrollToMessage(message_id)} className="relative bg-[#242424] pt-2 pb-2 px-2 rounded-lg flex-col gap-2 py-2 border-t border-gray-600 pl-3 border-l-2 border-gray-600">
-          <div className="flex flex-col gap-0 mb-0">
-            <p className="font-semibold mb-0">{message.timestamp ? timestamp : 'No timestamp'}</p>
-            <div className="mt-0">{parseIndepMessage(message.content)}</div>
+  const messageContent = (message_id: string): JSX.Element => {
+    const message = messages.find((msg) => msg._id === message_id);
+      if (message) {
+        const timestamp = message.timestamp = (new Date(message.timestamp)).toLocaleString('en-US');
+        return (
+          <div onClick={() => scrollToMessage(message_id)} className="relative bg-[#242424] pt-2 pb-2 px-2 rounded-lg flex-col gap-2 py-2 border-t border-gray-600 pl-3 border-l-2 border-gray-600">
+            <div className="flex flex-col gap-0 mb-0">
+              <p className="font-semibold mb-0">{message.timestamp ? timestamp : 'No timestamp'}</p>
+              <div className="mt-0">{parseIndepMessage(message.content)}</div>
+            </div>
+            <div className="border-l-2 border-gray-600"></div>
           </div>
-          <div className="border-l-2 border-gray-600"></div>
+        );
+      }
+      else if (message_id === post.message._id) {
+        const timestamp = post.timestamp = (new Date(post.timestamp)).toLocaleString('en-US');
+        return (
+          <div className="block">
+          <p
+            onClick={() => scrollToMessage(message_id)}
+            onMouseMove={(e) => handleMouseMove(e, '')}
+            onMouseLeave={() => setShowDiv(false)}
+            className="inline-block text-blue-500"
+          >
+            {">>OP"}
+          </p>
+          {showDiv && (
+            <div
+            className="absolute bg-[#242424] p-2 rounded pointer-events-none max-w-[70%]"
+            style={{
+              top: `${position.y + 10}px`,
+              left: `${position.x + 10}px`,
+              }}
+            >
+          <div className="relative bg-[#242424] rounded-lg flex-col gap-2">
+          <div className="flex flex-col gap-0 mb-0">
+              <p className="font-semibold">1. {post.timestamp ? timestamp : 'No timestamp'}</p>
+            </div>
+            <div>{parseIndepMessage(post.message.content)}</div>
+          <div className=" border-l-2 border-gray-600"></div>
+        </div>
+        </div>
+        )}
+        </div>
+        );
+      }
+      else {
+        return (
+          <div className="block">
+          <p
+            onMouseMove={(e) => handleMouseMove(e, message_id)}
+            onMouseLeave={() => setShowDiv(false)}
+            className="inline-block text-blue-500 cursor-default"
+          >
+            {topic && postId ? (
+              <Link href={`/${topic}/${postId}/#${message_id}`}>
+                {">>>post"}
+              </Link>
+            ) : (
+              <span>{">>>post"}</span>
+            )}
+          </p>
+          {showDiv ? (
+            divIsLoading && pointedPost ? (
+              null
+            ) : (
+              (
+                <div
+                className="absolute bg-[#242424] p-2 rounded pointer-events-none max-w-[70%]"
+                style={{
+                  top: `${position.y + 10}px`,
+                  left: `${position.x + 10}px`,
+                  }}
+                >
+              <div className="relative bg-[#242424] rounded-lg flex-col gap-2">
+              <div className="flex flex-col gap-0 mb-0">
+                  <p className="font-semibold">1. {pointedPost?.timestamp ? pointedPost.timestamp : 'No timestamp'}</p>
+                </div>
+                {pointedPost?.content ? <div>{parseIndepMessage(pointedPost.content)} </div> : null}
+              <div className=" border-l-2 border-gray-600"></div>
+            </div>
+            </div>
+            )
+            )
+          ) : null}
         </div>
       );
-    }
-    else if (message_id === post.message._id) {
-      const timestamp = post.timestamp = (new Date(post.timestamp)).toLocaleString('en-US');
-      return (
-        <div className="block">
-        <p
-          onClick={() => scrollToMessage(message_id)}
-          onMouseMove={(e) => handleMouseMove(e, '')}
-          onMouseLeave={handleMouseLeave}
-          className="inline-block text-blue-500"
-        >
-          {">>OP"}
-        </p>
-        {showDiv && (
-          <div
-          className="absolute bg-[#242424] p-2 rounded pointer-events-none max-w-[70%]"
-          style={{
-            top: `${position.y + 10}px`,
-            left: `${position.x + 10}px`,
-            }}
-          >
-        <div className="relative bg-[#242424] rounded-lg flex-col gap-2">
-        <div className="flex flex-col gap-0 mb-0">
-            <p className="font-semibold">1. {post.timestamp ? timestamp : 'No timestamp'}</p>
-          </div>
-          <div>{parseIndepMessage(post.message.content)}</div>
-        <div className=" border-l-2 border-gray-600"></div>
-      </div>
-      </div>
-      )}
-      </div>
-      );
-    }
-    else {
-      return (
-        <div className="block">
-        <p
-          onMouseMove={(e) => handleMouseMove(e, message_id)}
-          onMouseLeave={handleMouseLeave}
-          className="inline-block text-blue-500 cursor-default"
-        >
-          {topic && postId ? (
-            <Link href={`/${topic}/${postId}/#${message_id}`}>
-              {">>>post"}
-            </Link>
-          ) : (
-            <span>{">>>post"}</span>
-          )}
-        </p>
-        {showDiv ? (
-          divIsLoading && pointedPost ? (
-            null
-          ) : (
-            (
-              <div
-              className="absolute bg-[#242424] p-2 rounded pointer-events-none max-w-[70%]"
-              style={{
-                top: `${position.y + 10}px`,
-                left: `${position.x + 10}px`,
-                }}
-              >
-            <div className="relative bg-[#242424] rounded-lg flex-col gap-2">
-            <div className="flex flex-col gap-0 mb-0">
-                <p className="font-semibold">1. {pointedPost?.timestamp ? pointedPost.timestamp : 'No timestamp'}</p>
-              </div>
-              {pointedPost?.content ? <div>{parseIndepMessage(pointedPost.content)} </div> : null}
-            <div className=" border-l-2 border-gray-600"></div>
-          </div>
-          </div>
-          )
-          )
-        ) : null}
-      </div>
-    );
-    }
+      }
   };
   const parseIndepMessage = (message: string) : JSX.Element[] => {
     const parts = message.split(/(>>(\w{24})(\s|$|\n))/g);
@@ -259,7 +240,7 @@ const MessageComp = ({ post, messages, message, index, isOP, isTopLevel = true }
       parts.push(content.slice(lastIndex, match.index));
 
       const message_id = match[1];
-      const foundMessageJSX = findMessageById(message_id);
+      const foundMessageJSX = messageContent(message_id);
       parts.push(
         <div key={match.index}>
           {foundMessageJSX}
@@ -271,14 +252,6 @@ const MessageComp = ({ post, messages, message, index, isOP, isTopLevel = true }
     parts.push(content.slice(lastIndex));
 
     return parts;
-  };
-
-  const findMessageIndex = (message_id: string): number => {
-    const index = post.messages.findIndex((message: MessageType) => message._id === message_id);
-    if(index === -1){
-      return 0;
-    }
-    return index;
   };
 
   if (isOP) {
@@ -296,7 +269,6 @@ const MessageComp = ({ post, messages, message, index, isOP, isTopLevel = true }
         ) : (
           <p className="pt-2 text-gray-300">No messages</p>
         )}
-
       </div>
     );
   }
@@ -318,7 +290,7 @@ const MessageComp = ({ post, messages, message, index, isOP, isTopLevel = true }
             <p>Loading replies...</p>
           ) : (
             replyMessages.map((reply: MessageType) => {
-              const indexInMessages = findMessageIndex(reply._id);
+              const indexInMessages = findMessageIndex(reply._id, post);
               return (
                 <div className="border-r-2 border-t-2 border-l-2 mb-1 border-b-2 border-gray-600">
                 <MessageComp

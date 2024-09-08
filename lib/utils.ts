@@ -1,22 +1,23 @@
-import { NextResponse } from 'next/server';
-import Topic from '../models/topic';
+import { Message, Post } from './types';
 
-export async function POST(request: Request) {
-  try {
-    const { name } = await request.json();
-
-    if (!name) {
-      return NextResponse.json({ message: 'Invalid input data' }, { status: 400 });
-    }
-
-    const newTopic = new Topic({
-      name,
-    });
-
-    const savedTopic = await newTopic.save();
-    return NextResponse.json(savedTopic, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ message: 'Failed to create topic', error: error.message }, { status: 500 });
+export const findMessageIndex = (message_id: string, post: Post): number => {
+  const index = post.messages.findIndex((message: Message) => message._id === message_id);
+  if(index === -1){
+    return 0;
   }
-}
+  return index;
+};
 
+export const isElementInViewport = (message_id: string, document: Document): boolean => {
+  const element = document.getElementById(message_id);
+  if (element) {
+    const rect = element.getBoundingClientRect();
+    return (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  }
+  return false;
+};
