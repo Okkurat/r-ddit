@@ -42,7 +42,6 @@ const PostPage = async ({ params }: { params: Params }) => {
     .lean<PostType>()
     .exec();
     if(post){
-      console.log("POST IN POST PAGE", post);
       const messageIds = new Set(post.messages.map(m => m._id.toString()));
       if(post.message && post.message.replies){
         post.message.replies = post.message.replies.filter(reply => messageIds.has(reply._id.toString()));
@@ -55,10 +54,10 @@ const PostPage = async ({ params }: { params: Params }) => {
   } catch (error) {
 
     console.error('Error fetching post:', error);
-    redirect('/error');
+    redirect(`/${params.topic}`);
   }
 
-  if (!post) return <div className="bg-black text-gray-400 p-4">Post does not exist</div>;
+  if (!post) return redirect(`/${params.topic}`);
 
   
   

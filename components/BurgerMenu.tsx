@@ -1,4 +1,5 @@
 import { deleteMessage } from "@/app/actions";
+import router from "next/router";
 import React, { useState } from "react"
 
 interface BurgerMenuProps {
@@ -20,8 +21,12 @@ const BurgerMenu = ({isUser, messageId} : BurgerMenuProps) => {
       if(!isUser){
         return;
       }
-      const result = await deleteMessage(messageId);
-      console.log("Delete button clicked, result:", result);
+      const { error, success} = await deleteMessage(messageId);
+      if(error){
+        console.error(error);
+        return;
+      }
+      console.log(success);
     } catch (error) {
       console.error("Failed to delete message", error);
     }
@@ -33,12 +38,13 @@ const BurgerMenu = ({isUser, messageId} : BurgerMenuProps) => {
       </button>
       {isOpen && (
         <div className="absolute right-0 mt-1 w-48 border border-[#242424] bg-[#1a1a1a] p-2 rounded z-10">
-          <button className="w-full px-4 py-2 text-[#CCCCCC] bg-[#242424] hover:bg-[#3E3F3E] rounded-md mb-2" onClick={handleReportClick}>
+          <button className="w-full px-4 py-2 text-[#CCCCCC] bg-[#242424] hover:bg-[#3E3F3E] rounded-md" onClick={handleReportClick}>
             Report
           </button>
-          <button className="w-full px-4 py-2 text-[#CCCCCC] bg-[#242424] hover:bg-[#3E3F3E] rounded" onClick={handleHideClick}>
+          {!isUser &&
+          <button className="w-full px-4 py-2 text-[#CCCCCC] bg-[#242424] hover:bg-[#3E3F3E] rounded mt-2" onClick={handleHideClick}>
             Hide
-          </button>
+          </button>}
           {isUser &&           
           <button className="w-full px-4 py-2 text-[#CCCCCC] bg-[#242424] hover:bg-[#3E3F3E] rounded mt-2" onClick={handleDeleteClick}>
             Delete

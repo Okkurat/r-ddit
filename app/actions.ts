@@ -4,7 +4,7 @@ import connectDB from "@/lib/mongoose";
 import Message from "@/models/message";
 import Post from "@/models/post";
 import Topic from "@/models/topic";
-import { MessageData, PostData, TopicType } from '@/lib/types';
+import { MessageData, PostData, Post as PostType, TopicType } from '@/lib/types';
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -118,22 +118,69 @@ export async function createMessage(props: MessageProps){
   }
 };
 
-export async function deleteMessage(message_id: string) {
+async function deletePost(postId: string) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { error: 'User does not exist' };
+    }
+    const post = await Post.findById(postId).exec();
+    if(!post){
+      return { error: 'Post not found' };
+    }
+    if (user.id !== post.author) {
+      return { error: 'You are not the author of this post' };
+    }
+    const topic = await Topic.findOne({ posts: post._id }).exec();
+    if (!topic) {
+      return { error: 'Topic containing this post not found'};
+    }
+
+    await Message.deleteMany({ _id: { $in: post.messages } }).exec();
+
+    await Post.deleteOne({ _id: postId }).exec();
+    revalidatePath(`/${topic.name}/${post._id}`);
+    revalidatePath(`/${topic.name}`);
+    return { 
+      success: 'Post and related messages deleted successfully',
+    };
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return {
+          error: error.message || 'Failed to delete post'
+        };
+      } 
+      else {
+        return {
+          error: 'Unexpected error' || 'Failed to delete post'
+        };
+      }
+    }
+}
+
+export async function deleteMessage(messageId: string) {
   try {
     const user = await currentUser();
     if (!user) {
       return { error: 'User does not exist' };
     }
     await connectDB();
-    let message = await Message.findById(message_id).exec();
+    let message = await Message.findById(messageId).exec();
     if (!message) {
       return { error: 'Message not found' };
     }
-
-    let post;
-    post = await Post.findOne({ messages: message._id }).exec();
+    if(message.author !== user.id){
+      return { error: 'You are not the author of this message' };
+    }
+    const post = await Post.findOne({ messages: message._id }).exec();
     if(!post){
-      post = await Post.findOne({ message: message._id }).exec();
+      console.log("POST IS NOT IN MESSAGES, TRYING TO FIND IN POST");
+      const post = await Post.findOne({ message: message._id }).exec();
+      if (!post) {
+        return { error: 'Post containing this message not found' };
+      }
+      await deletePost(post.id);
+      return { error: 'Post containing this message not found' };
     }
     if (!post) {
       return { error: 'Post containing this message not found' };
@@ -153,11 +200,10 @@ export async function deleteMessage(message_id: string) {
       { $pull: { messages: message._id } }
     );
 
-    message = await Message.findByIdAndDelete(message_id).exec();
+    message = await Message.findByIdAndDelete(messageId).exec();
     revalidatePath(`/${topic.name}/${post._id}`);
     return {
-      success: `Message ${message_id} deleted successfully`,
-      message: message_id
+      success: `Message ${messageId} deleted successfully`,
     };
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -173,14 +219,14 @@ export async function deleteMessage(message_id: string) {
   }
 };
 
-export async function findMessage(message_id: string) {
+export async function findMessage(messageId: string) {
   try {
     const user = await currentUser();
     if (!user) {
       return { error: 'User does not exist' };
     }
     await connectDB();
-    const message = await Message.findById(message_id).populate('replies').lean().exec();
+    const message = await Message.findById(messageId).populate('replies').lean().exec();
     if (!message) {
       return { error: 'Message not found' };
     }
@@ -296,7 +342,14 @@ export async function createPost(props: PostProps) {
     revalidatePath(`/${props.topic.name}`);
     await topic.save();
     
-    return { savedPost: { title: savedPost.title, message: savedPost.message, id: savedPost.id.toString() } };
+    const plainSavedPost = {
+      title: savedPost.title,
+      message: savedPost.message.toString(),
+      id: savedPost.id.toString()
+    };
+
+    return { savedPost: plainSavedPost };
+
   } 
   catch (error: unknown) {
     if(error instanceof Error){

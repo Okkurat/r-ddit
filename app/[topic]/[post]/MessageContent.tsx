@@ -22,6 +22,8 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
   const [topic, setTopic] = useState<string>('');
   const [postId, setPostId] = useState<string>('');
 
+  //console.log("HEELLO", post, messageId, messages);
+
   useEffect(() => {
     setDivIsLoading(true);
     if(!showDiv || currentID === ''){
