@@ -118,6 +118,61 @@ export async function createMessage(props: MessageProps){
   }
 };
 
+export async function deleteMessage(message_id: string) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { error: 'User does not exist' };
+    }
+    await connectDB();
+    let message = await Message.findById(message_id).exec();
+    if (!message) {
+      return { error: 'Message not found' };
+    }
+
+    let post;
+    post = await Post.findOne({ messages: message._id }).exec();
+    if(!post){
+      post = await Post.findOne({ message: message._id }).exec();
+    }
+    if (!post) {
+      return { error: 'Post containing this message not found' };
+    }
+    
+    const topic = await Topic.findOne({ posts: post._id }).exec();
+    if (!topic) {
+      return { error: 'Topic containing this post not found'};
+    }
+
+    await Message.updateMany(
+      { replies: message._id },
+      { $pull: { replies: message._id } }
+    );
+    await Post.updateOne(
+      { _id: post._id },
+      { $pull: { messages: message._id } }
+    );
+
+    message = await Message.findByIdAndDelete(message_id).exec();
+    revalidatePath(`/${topic.name}/${post._id}`);
+    return {
+      success: `Message ${message_id} deleted successfully`,
+      message: message_id
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message || 'Failed to delete message'
+      };
+    }
+    else {
+      return {
+        error: 'Unexpected error' || 'Failed to delete message'
+      };
+    }
+  }
+};
+
 export async function findMessage(message_id: string) {
   try {
     const user = await currentUser();
@@ -138,7 +193,7 @@ export async function findMessage(message_id: string) {
     }
     else {
       return { 
-        error: 'Unexpecetd error' || 'Failed to find message' 
+        error: 'Unexpected error' || 'Failed to find message' 
       };
     }
   }

@@ -1,3 +1,4 @@
+import { deleteMessage } from "@/app/actions";
 import React, { useState } from "react"
 
 interface BurgerMenuProps {
@@ -14,9 +15,17 @@ const BurgerMenu = ({isUser, messageId} : BurgerMenuProps) => {
   const handleHideClick = () => {
     console.log("Hide button clicked", messageId)
   }
-  const handleDeleteClick = () => {
-    console.log("Delete button clicked", messageId)
-  }
+  const handleDeleteClick = async () => {
+    try {
+      if(!isUser){
+        return;
+      }
+      const result = await deleteMessage(messageId);
+      console.log("Delete button clicked, result:", result);
+    } catch (error) {
+      console.error("Failed to delete message", error);
+    }
+  };
   return (
     <div className="relative">
       <button className="rounded bg-[#242424] hover:bg-[#3E3F3E] px-4 py-2 text-primary-foreground ml-1" onClick={() => setIsOpen(!isOpen)}>

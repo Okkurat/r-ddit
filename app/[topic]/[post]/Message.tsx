@@ -102,7 +102,7 @@ const Message = ({ post, messages, message, isOP, topic, isTopLevel = true }: Re
 
     return parts;
   };
-
+  
   if (isOP) {
 
     return (
