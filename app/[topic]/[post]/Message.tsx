@@ -1,11 +1,13 @@
 import { findMessage } from "@/app/actions";
-import { useMessageContext } from "@/lib/MessageContext";
+import { useMessageContext, useSetIsAllowed } from "@/lib/MessageContext";
 import { Message as MessageType, Post, Reply} from '@/lib/types';
 import { scrollToMessage } from "@/lib/utils";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import MessageContent from "./MessageContent";
 import BurgerMenu from "@/components/BurgerMenu";
 import { useUserValue } from "@/lib/UserContext";
+import ReplyForm from "./ReplyForm";
+import { set } from "mongoose";
 
 interface RepliesProps {
   messages: MessageType[];
@@ -13,15 +15,19 @@ interface RepliesProps {
   post: Post;
   isTopLevel?: boolean;
   isOP: boolean;
+  topic: string;
 }
 
-const Message = ({ post, messages, message, isOP, isTopLevel = true }: RepliesProps) => {
+const Message = ({ post, messages, message, isOP, topic, isTopLevel = true }: RepliesProps) => {
 
   const user = useUserValue();
-  const { value, setValue } = useMessageContext();
+  
+  const { value, setValue, setIsAllowed, isAllowed } = useMessageContext();
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
   const [replyMessages, setReplyMessages] = useState<MessageType[]>([]);
+  const [isReplyingId, setIsReplyingId] = useState('');
+  const [isReplyingMessage, setIsReplyingMessage] = useState(false);
 
   const fetchReplyMessage = async (replyId: string) => {
     // handle errors more better here pls
@@ -63,6 +69,12 @@ const Message = ({ post, messages, message, isOP, isTopLevel = true }: RepliesPr
 
   
   const handleClick = (messageId: string): void => {
+    if(isAllowed === messageId){
+      setIsAllowed('');
+      setValue('');
+      return;
+    }
+    setIsAllowed(messageId);
     if (value.trim() === '') {
       setValue(`>>${messageId}\n`);
     } else {
@@ -109,17 +121,19 @@ const Message = ({ post, messages, message, isOP, isTopLevel = true }: RepliesPr
         ) : (
           <p className="pt-2 text-gray-300">No messages</p>
         )}
+        {isAllowed === message._id && <ReplyForm topic={topic} post={post._id}></ReplyForm>}
       </div>
     );
   }
   
   return (
-    <div id={message._id} className="bg-[#171717] pl-2 mb-2 pr-2">
+    <div id={isTopLevel ? message._id : ''} className="bg-[#171717] pl-2 mb-2 pr-2">
       <div className="flex-col gap-4 py-1" key={message._id}>
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-semibold">Anonymous {message.timestamp ? message.timestamp : 'No timestamp'}</h2>
-          <button onClick={() => handleClick(message._id)} className="ml-auto bg-[#242424] text-[#CCCCCC] py-2 px-4 rounded hover:bg-[#3E3F3E]">Reply</button>
-          <BurgerMenu isUser={user===message.author} messageId={message._id}></BurgerMenu>
+          {isTopLevel && <button onClick={() => handleClick(message._id)} className="ml-auto bg-[#242424] text-[#CCCCCC] py-2 px-4 rounded hover:bg-[#3E3F3E]">Reply</button>}
+          {isTopLevel && <BurgerMenu isUser={user===message.author} messageId={message._id}></BurgerMenu>}
+          {!isTopLevel && <button onClick={() => scrollToMessage(message._id)} className="ml-auto bg-[#242424] text-[#CCCCCC] py-2 px-4 rounded hover:bg-[#3E3F3E]">Move</button>}
         </div>
         <div>{splitMessageContent(message.content)}</div>
         {message.replies.length > 0 && <button onClick={() => setShow(!show)} className="ml-auto bg-[#242424] text-[#CCCCCC] py-2 px-4 rounded hover:bg-[#3E3F3E]">{message.replies.length}</button>}
@@ -134,6 +148,7 @@ const Message = ({ post, messages, message, isOP, isTopLevel = true }: RepliesPr
               return (
                 <div key={reply._id} className="border-r-2 border-t-2 border-l-2 mb-1 border-b-2 border-gray-600">
                 <Message
+                  topic={topic}
                   post={post}
                   messages={messages}
                   message={reply}
@@ -158,6 +173,7 @@ const Message = ({ post, messages, message, isOP, isTopLevel = true }: RepliesPr
           )}
         </div>
       )}
+      {isAllowed === message._id && <ReplyForm topic={topic} post={post._id}></ReplyForm>}
       </div>
       );
 };

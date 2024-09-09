@@ -22,11 +22,10 @@ const Post = ({ post, topic, user }: PostMainProps) => {
   return (
     <div className="bg-[#121212] rounded-lg border-2 border-[#242424]">
     <div className="">
-    <Message post={post} messages={post.messages} message={post.message} key={post.message._id} isOP={true}></Message>
+    <Message post={post} topic={topic} messages={post.messages} message={post.message} key={post.message._id} isOP={true}></Message>
     </div>
       <div className="bg-[#121212] p-2">
-      <Replies post={post} messages={post.messages}></Replies>
-      <ReplyForm topic={topic} post={post._id}></ReplyForm>
+      <Replies topic={topic} post={post} messages={post.messages}></Replies>
       </div>
   </div>
   );

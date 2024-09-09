@@ -5,15 +5,16 @@ import Message from "./Message";
 interface RepliesProps {
   messages: MessageType[];
   post: Post;
+  topic: string;
 }
 
-const Replies = ({ post, messages }: RepliesProps) => {
+const Replies = ({ post, messages, topic }: RepliesProps) => {
 
   return (
     <div>
       {messages.length > 0 ? (
         messages.map((message: MessageType) => (
-          <Message post={post} messages={messages} message={message} key={message._id} isOP={false} ></Message>
+          <Message post={post} topic={topic} messages={messages} message={message} key={message._id} isOP={false} ></Message>
         ))
       ) : null}
     </div>

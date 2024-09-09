@@ -1,7 +1,7 @@
 'use client';
 import { createMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
-import { FormEvent, useState, useRef, useEffect, FC } from "react";
+import { FormEvent, useState, useRef, useEffect, FC, use } from "react";
 
 interface Params {
   post: string;
@@ -13,16 +13,13 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
-  const { value, setValue } = useMessageContext();
+  const { value, setValue, setIsAllowed } = useMessageContext();
 
   useEffect(() => {
     if (textareaRef.current) {
       const textarea = textareaRef.current;
       textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
-    }
-    if (formRef.current && value !== '') {
-      formRef.current.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
   }, [value]);
 
@@ -60,10 +57,12 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
         setError('Unexpected error happened!');
       }
     } finally {
+      setIsAllowed('');
       setLoading(false);
       setValue('');
     }
   };
+
 
   return (
     <div ref={formRef}>
