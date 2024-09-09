@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { dark } from '@clerk/themes'
 import Link from 'next/link';
 import {
   ClerkProvider,
@@ -31,7 +32,7 @@ const RootLayout = async (props: RootLayoutProps) => {
   }
 
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={{ baseTheme: dark, }}>
       <html lang="en">
         <body className="flex flex-col min-h-screen">
           <SignedOut>

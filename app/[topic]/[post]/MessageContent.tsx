@@ -11,7 +11,7 @@ interface MessageContentProps {
   post: Post;
 }
 
-const MessageContent = ({post, messageId, messages}: MessageContentProps) => {
+const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [showDiv, setShowDiv] = useState(false);
@@ -116,7 +116,7 @@ const MessageContent = ({post, messageId, messages}: MessageContentProps) => {
           >
         <div className="relative bg-[#242424] rounded-lg flex-col gap-2">
         <div className="flex flex-col gap-0 mb-0">
-            <p className="font-semibold">1. {post.timestamp ? timestamp : 'No timestamp'}</p>
+            <p className="font-semibold">Anonymous {post.timestamp ? timestamp : 'No timestamp'}</p>
           </div>
           <div>{parseIndepMessage(post.message.content)}</div>
         <div className=" border-l-2 border-gray-600"></div>
@@ -156,7 +156,7 @@ const MessageContent = ({post, messageId, messages}: MessageContentProps) => {
               >
             <div className="relative bg-[#242424] rounded-lg flex-col gap-2">
             <div className="flex flex-col gap-0 mb-0">
-                <p className="font-semibold">1. {pointedPost?.timestamp ? pointedPost.timestamp : 'No timestamp'}</p>
+                <p className="font-semibold">Anonymous {pointedPost?.timestamp ? pointedPost.timestamp : 'No timestamp'}</p>
               </div>
               {pointedPost?.content ? <div>{parseIndepMessage(pointedPost.content)} </div> : null}
             <div className=" border-l-2 border-gray-600"></div>

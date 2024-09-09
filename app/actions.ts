@@ -77,8 +77,11 @@ export async function createMessage(props: MessageProps){
       content: props.message,
       author: user.id
     };
+    console.log(props.post);
     const newMessage = new Message(newMessageData);
     const post = await Post.findById(props.post).populate('message', '', Message);
+    console.log("HERE");
+
     if(!post){
       return { error: 'Post not found' };
     }

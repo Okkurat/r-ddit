@@ -1,13 +1,5 @@
 import { Message, Post } from './types';
 
-export const findMessageIndex = (message_id: string, post: Post): number => {
-  const index = post.messages.findIndex((message: Message) => message._id === message_id);
-  if(index === -1){
-    return 0;
-  }
-  return index;
-};
-
 export const isElementInViewport = (message_id: string, document: Document): boolean => {
   const element = document.getElementById(message_id);
   if (element) {

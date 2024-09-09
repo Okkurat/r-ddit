@@ -1,9 +1,9 @@
-import { Message, Post } from '@/lib/types';
+import { Message as MessageType, Post } from '@/lib/types';
 import React from "react";
-import MessageComp from "./Message";
+import Message from "./Message";
 
 interface RepliesProps {
-  messages: Message[];
+  messages: MessageType[];
   post: Post;
 }
 
@@ -12,8 +12,8 @@ const Replies = ({ post, messages }: RepliesProps) => {
   return (
     <div>
       {messages.length > 0 ? (
-        messages.map((message: Message, index: number) => (
-          <MessageComp post={post} messages={messages} message={message} index={index} key={message._id} isOP={false}></MessageComp>
+        messages.map((message: MessageType) => (
+          <Message post={post} messages={messages} message={message} key={message._id} isOP={false} ></Message>
         ))
       ) : null}
     </div>

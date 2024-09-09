@@ -4,6 +4,7 @@ import Message from '@/models/message';
 import { Message as MessageType, Post as PostType, Reply } from '@/lib/types';
 import PostMain from './PostMain';
 import React from "react";
+import { currentUser } from '@clerk/nextjs/server';
 
 interface Params {
   post: string;
@@ -11,6 +12,12 @@ interface Params {
 }
 
 const PostPage = async ({ params }: { params: Params }) => {
+
+  const user = await currentUser();
+  if (!user) {
+    return <div>Error</div>;
+  }
+
   let post: PostType | null = null;
   try {
     await connectDB();
@@ -74,7 +81,7 @@ const PostPage = async ({ params }: { params: Params }) => {
   const data = JSON.parse(JSON.stringify(post));
 
   return (
-    <PostMain params={params} post={data}></PostMain>
+    <PostMain params={params} post={data} user={user.id}></PostMain>
   );
 };
 

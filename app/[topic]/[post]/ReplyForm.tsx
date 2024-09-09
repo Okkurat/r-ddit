@@ -1,7 +1,6 @@
 'use client';
 import { createMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
-import { set } from "mongoose";
 import { FormEvent, useState, useRef, useEffect, FC } from "react";
 
 interface Params {
