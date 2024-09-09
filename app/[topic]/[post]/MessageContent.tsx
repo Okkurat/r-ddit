@@ -2,6 +2,7 @@
 import { fetchMessageWithPostAndTopic } from "@/app/actions";
 import { Message, Post } from "@/lib/types";
 import { scrollToMessage } from "@/lib/utils";
+import { set } from "mongoose";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 

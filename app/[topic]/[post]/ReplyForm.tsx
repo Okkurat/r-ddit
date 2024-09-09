@@ -1,25 +1,30 @@
 'use client';
 import { createMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
+import { isElementInViewport } from "@/lib/utils";
 import { FormEvent, useState, useRef, useEffect, FC, use } from "react";
 
 interface Params {
   post: string;
   topic: string;
+  isDefault: boolean;
 }
 
-const ReplyForm: FC<Params> = ({ topic, post }) => {
+const ReplyForm: FC<Params> = ({ topic, post, isDefault }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
-  const { value, setValue, setIsAllowed } = useMessageContext();
+  const { value, setValue, setIsAllowed, isAllowed } = useMessageContext();
 
   useEffect(() => {
     if (textareaRef.current) {
       const textarea = textareaRef.current;
       textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+    if (formRef.current && value !== '') {
+      formRef.current.scrollIntoView({ behavior: 'instant', block: 'center' });
     }
   }, [value]);
 
@@ -62,10 +67,11 @@ const ReplyForm: FC<Params> = ({ topic, post }) => {
       setValue('');
     }
   };
-
-
+  if(isAllowed !== '' && isDefault && (document.getElementById("bottom-reply-form") || document.getElementById("reply-form")) && !(isElementInViewport('bottom-reply-form', document))){
+    return null;
+  }
   return (
-    <div ref={formRef}>
+    <div id={isDefault ? "bottom-reply-form" : "reply-form"} ref={formRef}>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="message" className="block text-sm font-medium mb-1">

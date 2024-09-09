@@ -1,7 +1,7 @@
 import { Message, Post } from './types';
 
-export const isElementInViewport = (message_id: string, document: Document): boolean => {
-  const element = document.getElementById(message_id);
+export const isElementInViewport = (id: string, document: Document): boolean => {
+  const element = document.getElementById(id);
   if (element) {
     const rect = element.getBoundingClientRect();
     return (

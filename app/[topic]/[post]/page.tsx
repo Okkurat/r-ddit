@@ -5,6 +5,7 @@ import { Message as MessageType, Post as PostType, Reply } from '@/lib/types';
 import PostMain from './PostMain';
 import React from "react";
 import { currentUser } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation'
 
 interface Params {
   post: string;
@@ -52,8 +53,9 @@ const PostPage = async ({ params }: { params: Params }) => {
       }));
     }
   } catch (error) {
+
     console.error('Error fetching post:', error);
-    return <div className="bg-black text-red-500 p-4">Error fetching post. Please try again later.</div>;
+    redirect('/error');
   }
 
   if (!post) return <div className="bg-black text-gray-400 p-4">Post does not exist</div>;

@@ -3,6 +3,7 @@ import { fetchTopicData } from '../server-actions';
 import PostForm from './PostForm';
 import { currentUser } from '@clerk/nextjs/server';
 import { PostPlain, TopicSummary } from '@/lib/types';
+import { redirect } from 'next/navigation'
 
 interface Params {
   topic: string
@@ -19,7 +20,7 @@ const TopicPage = async ({ params }: { params: Params }) => {
 
   if ('error' in response) {
     console.error('Error fetching topic:', response.error);
-    return <div className="text-red-500">Error fetching topic. Please try again later.</div>;
+    redirect('/error');
   }
 
   const topic: TopicSummary | null = response;

@@ -9,6 +9,9 @@ import TopicForm from './TopicForm';
 const HomePage = async () => {
   const user = await currentUser();
   const username = user?.username;
+  if(!user){
+    return <div>Error</div>;
+  }
   let topics: TopicType[] = [];
   try {
     await connectDB();

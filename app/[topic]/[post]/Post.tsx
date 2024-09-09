@@ -26,6 +26,7 @@ const Post = ({ post, topic, user }: PostMainProps) => {
     </div>
       <div className="bg-[#121212] p-2">
       <Replies topic={topic} post={post} messages={post.messages}></Replies>
+      <ReplyForm topic={topic} post={post._id} isDefault={true}></ReplyForm>
       </div>
   </div>
   );

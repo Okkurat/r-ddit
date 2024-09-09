@@ -1,13 +1,12 @@
 import { findMessage } from "@/app/actions";
-import { useMessageContext, useSetIsAllowed } from "@/lib/MessageContext";
+import { useMessageContext } from "@/lib/MessageContext";
 import { Message as MessageType, Post, Reply} from '@/lib/types';
-import { scrollToMessage } from "@/lib/utils";
+import { isElementInViewport, scrollToMessage } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import MessageContent from "./MessageContent";
 import BurgerMenu from "@/components/BurgerMenu";
 import { useUserValue } from "@/lib/UserContext";
 import ReplyForm from "./ReplyForm";
-import { set } from "mongoose";
 
 interface RepliesProps {
   messages: MessageType[];
@@ -26,8 +25,6 @@ const Message = ({ post, messages, message, isOP, topic, isTopLevel = true }: Re
   const [isLoading, setIsLoading] = useState(false);
   const [show, setShow] = useState(false);
   const [replyMessages, setReplyMessages] = useState<MessageType[]>([]);
-  const [isReplyingId, setIsReplyingId] = useState('');
-  const [isReplyingMessage, setIsReplyingMessage] = useState(false);
 
   const fetchReplyMessage = async (replyId: string) => {
     // handle errors more better here pls
@@ -69,6 +66,7 @@ const Message = ({ post, messages, message, isOP, topic, isTopLevel = true }: Re
 
   
   const handleClick = (messageId: string): void => {
+    console.log(isAllowed, messageId);
     if(isAllowed === messageId){
       setIsAllowed('');
       setValue('');
@@ -121,7 +119,7 @@ const Message = ({ post, messages, message, isOP, topic, isTopLevel = true }: Re
         ) : (
           <p className="pt-2 text-gray-300">No messages</p>
         )}
-        {isAllowed === message._id && <ReplyForm topic={topic} post={post._id}></ReplyForm>}
+        {isAllowed === message._id && !(isElementInViewport('bottom-reply-form', document)) && <ReplyForm topic={topic} post={post._id} isDefault={false}></ReplyForm>}
       </div>
     );
   }
@@ -173,7 +171,7 @@ const Message = ({ post, messages, message, isOP, topic, isTopLevel = true }: Re
           )}
         </div>
       )}
-      {isAllowed === message._id && <ReplyForm topic={topic} post={post._id}></ReplyForm>}
+      {isAllowed === message._id && !(isElementInViewport('bottom-reply-form', document)) && <ReplyForm topic={topic} post={post._id} isDefault={false}></ReplyForm>}
       </div>
       );
 };
