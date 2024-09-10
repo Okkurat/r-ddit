@@ -35,7 +35,7 @@ export async function createReport(reportDetails: string, reportReason: string, 
       return { error: 'Message not found' };
     }
 
-    let post: any = await Post.findOne({ messages: messageId }).exec();
+    let post = await Post.findOne({ messages: messageId }).exec();
     if(!post){
       post = await Post.findOne({ message: messageId }).exec();
       if (!post) {
@@ -53,10 +53,11 @@ export async function createReport(reportDetails: string, reportReason: string, 
       author: message.author,
       message: messageId,
       topic: topic.name,
-      post: post._id.toString(),
+      post: post.id.toString(),
     };
     const newReport = new Report(reportData);
     await newReport.save();
+    revalidatePath('/modding/reports');
     return { success: 'Report created' };
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -151,7 +152,7 @@ export async function createMessage(props: MessageProps){
     if(post.locked){
       return { error: 'Post is locked' };
     }
-    post.messages.push(newMessage._id as any);
+    post.messages.push(newMessage.id as any);
     post.latestPost = newMessage.timestamp;
     let count = 0;
     for (const message of post.messages) {

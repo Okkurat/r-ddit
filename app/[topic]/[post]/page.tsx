@@ -5,7 +5,7 @@ import { Message as MessageType, Post as PostType, Reply } from '@/lib/types';
 import PostMain from './PostMain';
 import React from "react";
 import { currentUser } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation'
+import { redirect } from 'next/navigation';
 
 interface Params {
   post: string;
@@ -75,7 +75,7 @@ const PostPage = async ({ params }: { params: Params }) => {
   const splitMessageContent = async (content: string) => {
     const regex = />>(\w{24})(\s|$|\n)/g;
   
-    let match: any;
+    let match: RegExpExecArray | null;
     let modifiedContent = content;
     while ((match = regex.exec(content)) !== null) {
       try {

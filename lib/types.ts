@@ -37,6 +37,17 @@ export interface ReportData {
   post: string;
 }
 
+export interface Report {
+  _id: string;
+  reportDetails: string;
+  reportReason: string;
+  message: string;
+  author: string;
+  topic: string;
+  post: string;
+  timestamp: Date;
+}
+
 export interface Post {
   _id: string;
   title: string;

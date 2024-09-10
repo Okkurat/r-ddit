@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { dark } from '@clerk/themes'
+import { dark } from '@clerk/themes';
 import Link from 'next/link';
 import {
   ClerkProvider,

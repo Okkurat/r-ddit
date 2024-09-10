@@ -1,5 +1,5 @@
 import { createReport, deleteMessage } from "@/app/actions";
-import React, { FormEvent, useEffect, useRef, useState } from "react"
+import React, { FormEvent, useEffect, useRef, useState } from "react";
 
 interface BurgerMenuProps {
   isUser: boolean;
@@ -57,10 +57,10 @@ const BurgerMenu = ({isUser, messageId} : BurgerMenuProps) => {
       console.error("Failed to create report", error);
     }
 
-  }
+  };
   const handleHideClick = () => {
-    console.log("Hide button clicked", messageId)
-  }
+    console.log("Hide button clicked", messageId);
+  };
   const handleDeleteClick = async () => {
     try {
       if(!isUser){
@@ -189,8 +189,8 @@ const BurgerMenu = ({isUser, messageId} : BurgerMenuProps) => {
       </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 const MenuIcon = () => {
   return (
@@ -209,7 +209,7 @@ const MenuIcon = () => {
       <line x1="4" x2="20" y1="6" y2="6" />
       <line x1="4" x2="20" y1="18" y2="18" />
     </svg>
-  )
-}
+  );
+};
 
 export default BurgerMenu;

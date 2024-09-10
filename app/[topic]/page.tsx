@@ -3,7 +3,7 @@ import { fetchTopicData } from '../server-actions';
 import PostForm from './PostForm';
 import { currentUser } from '@clerk/nextjs/server';
 import { MessageWithoutReplies, PostPlain, TopicSummary } from '@/lib/types';
-import { redirect } from 'next/navigation'
+import { redirect } from 'next/navigation';
 import Message from '@/models/message';
 
 interface Params {
@@ -35,7 +35,7 @@ const TopicPage = async ({ params }: { params: Params }) => {
   const splitMessageContent = async (content: string) => {
     const regex = />>(\w{24})(\s|$|\n)/g;
   
-    let match: any;
+    let match: RegExpExecArray | null;
     let modifiedContent = content;
     while ((match = regex.exec(content)) !== null) {
       try {
