@@ -8,9 +8,10 @@ interface Params {
   post: string;
   topic: string;
   isDefault: boolean;
+  locked: boolean;
 }
 
-const ReplyForm: FC<Params> = ({ topic, post, isDefault }) => {
+const ReplyForm: FC<Params> = ({ topic, post, isDefault, locked=false }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -67,6 +68,13 @@ const ReplyForm: FC<Params> = ({ topic, post, isDefault }) => {
       setValue('');
     }
   };
+  if(locked){
+    return (
+    <div className="bg-[#171717] text-center p-2 rounded border border-[#242424] w-full">
+      <p>This post is locked</p>
+    </div>
+    );
+  }
   if(isAllowed !== '' && isDefault && (document.getElementById("bottom-reply-form") || document.getElementById("reply-form")) && !(isElementInViewport('bottom-reply-form', document))){
     return null;
   }

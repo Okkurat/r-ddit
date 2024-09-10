@@ -13,6 +13,10 @@ export interface Reply {
   timestamp: string;
   author: string;
   replies: Reply[];
+  deleted?: {
+    timestamp?: Date;
+    isDeleted?: boolean;
+  };
 }
 
 export interface PostData {
@@ -33,6 +37,7 @@ export interface Post {
   messages: Message[]
   timestamp: string;
   latestPost: Date;
+  locked?: boolean;
 }
 export interface PostPlain {
   _id: string;
@@ -55,6 +60,10 @@ export interface Message {
   author: string;
   timestamp: string;
   replies: Reply[];
+  deleted?: {
+    timestamp?: Date;
+    isDeleted?: boolean;
+  };
 }
 
 export type MessageWithoutReplies = Omit<Message, 'replies'>;

@@ -4,7 +4,7 @@ import connectDB from "@/lib/mongoose";
 import Message from "@/models/message";
 import Post from "@/models/post";
 import Topic from "@/models/topic";
-import { MessageData, PostData, Post as PostType, TopicType } from '@/lib/types';
+import { MessageData, PostData, Post as PostType, Message as MessageType, TopicType } from '@/lib/types';
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -86,8 +86,23 @@ export async function createMessage(props: MessageProps){
       return { error: 'Post not found' };
     }
     console.log(post);
+    if(post.locked){
+      return { error: 'Post is locked' };
+    }
     post.messages.push(newMessage._id as any);
     post.latestPost = newMessage.timestamp;
+    let count = 0;
+    for (const message of post.messages) {
+      const msg = await Message.findById(message.toString()).lean().exec();
+      if (!msg?.deleted?.isDeleted) {
+        count++;
+        console.log(count);
+      }
+      if (count === 100) {
+        post.locked = true;
+        break;
+      }
+    }
     await post.save();
     await newMessage.save();
 
@@ -118,46 +133,6 @@ export async function createMessage(props: MessageProps){
   }
 };
 
-async function deletePost(postId: string) {
-  try {
-    const user = await currentUser();
-    if (!user) {
-      return { error: 'User does not exist' };
-    }
-    const post = await Post.findById(postId).exec();
-    if(!post){
-      return { error: 'Post not found' };
-    }
-    if (user.id !== post.author) {
-      return { error: 'You are not the author of this post' };
-    }
-    const topic = await Topic.findOne({ posts: post._id }).exec();
-    if (!topic) {
-      return { error: 'Topic containing this post not found'};
-    }
-
-    await Message.deleteMany({ _id: { $in: post.messages } }).exec();
-
-    await Post.deleteOne({ _id: postId }).exec();
-    revalidatePath(`/${topic.name}/${post._id}`);
-    revalidatePath(`/${topic.name}`);
-    return { 
-      success: 'Post and related messages deleted successfully',
-    };
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        return {
-          error: error.message || 'Failed to delete post'
-        };
-      } 
-      else {
-        return {
-          error: 'Unexpected error' || 'Failed to delete post'
-        };
-      }
-    }
-}
-
 export async function deleteMessage(messageId: string) {
   try {
     const user = await currentUser();
@@ -172,35 +147,20 @@ export async function deleteMessage(messageId: string) {
     if(message.author !== user.id){
       return { error: 'You are not the author of this message' };
     }
-    const post = await Post.findOne({ messages: message._id }).exec();
+    let post = await Post.findOne({ messages: message._id }).exec();
     if(!post){
       console.log("POST IS NOT IN MESSAGES, TRYING TO FIND IN POST");
-      const post = await Post.findOne({ message: message._id }).exec();
+      post = await Post.findOne({ message: message._id }).exec();
       if (!post) {
         return { error: 'Post containing this message not found' };
       }
-      await deletePost(post.id);
-      return { error: 'Post containing this message not found' };
-    }
-    if (!post) {
-      return { error: 'Post containing this message not found' };
     }
     
     const topic = await Topic.findOne({ posts: post._id }).exec();
     if (!topic) {
       return { error: 'Topic containing this post not found'};
     }
-
-    await Message.updateMany(
-      { replies: message._id },
-      { $pull: { replies: message._id } }
-    );
-    await Post.updateOne(
-      { _id: post._id },
-      { $pull: { messages: message._id } }
-    );
-
-    message = await Message.findByIdAndDelete(messageId).exec();
+    message.markAsDeleted();
     revalidatePath(`/${topic.name}/${post._id}`);
     return {
       success: `Message ${messageId} deleted successfully`,

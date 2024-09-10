@@ -17,7 +17,7 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
     .populate<TopicSummary>({
       path: 'posts',
       model: Post,
-      select: 'title message author messages timestamp latestPost',
+      select: 'title message author messages timestamp latestPost deleted',
       populate: [
         {
           path: 'message',
@@ -36,7 +36,6 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
     if (!topic) {
       return { error: 'Topic does not exist' };
     }
-    console.log("TOPIC", topic);
     const topicSummary: TopicSummary = {
       id: topic._id?.toString(),
       name: topic.name,
@@ -47,14 +46,22 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
           _id: post.message._id,
           content: post.message.content,
           author: post.message.author,
-          timestamp: post.message.timestamp
+          timestamp: post.message.timestamp,
+          deleted: {
+            timestamp: post.message.deleted?.timestamp,
+            isDeleted: post.message.deleted?.isDeleted
+          }
         },
         author: post.author,
         messages: post.messages.map((message: MessageWithoutReplies) => ({
           _id: message._id?.toString(),
           content: message.content,
           author: message.author,
-          timestamp: message.timestamp
+          timestamp: message.timestamp,
+          deleted: {
+            timestamp: message.deleted?.timestamp,
+            isDeleted: message.deleted?.isDeleted
+          }
         })),
         timestamp: post.timestamp,
         latestPost: post.latestPost,

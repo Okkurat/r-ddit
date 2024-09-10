@@ -7,6 +7,7 @@ interface IPost extends Document {
   messages: mongoose.Schema.Types.ObjectId[];
   timestamp: Date;
   latestPost: Date;
+  locked: boolean;
 }
 
 const postSchema: Schema<IPost> = new mongoose.Schema({
@@ -24,7 +25,8 @@ const postSchema: Schema<IPost> = new mongoose.Schema({
     default: []
   }],
   timestamp: { type: Date, default: Date.now },
-  latestPost: { type: Date, default: Date.now }
+  latestPost: { type: Date, default: Date.now },
+  locked: { type: Boolean, default: false },
 });
 
 postSchema.set('toJSON', {

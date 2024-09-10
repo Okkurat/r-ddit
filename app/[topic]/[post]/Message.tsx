@@ -87,6 +87,7 @@ const Message = ({ post, messages, message, isOP, topic, isTopLevel = true }: Re
 
     let match;
     while ((match = regex.exec(content)) !== null) {
+      
       parts.push(content.slice(lastIndex, match.index));
 
       const messageId = match[1];
@@ -110,16 +111,16 @@ const Message = ({ post, messages, message, isOP, topic, isTopLevel = true }: Re
         <h1 className="text-xl font-semibold mb-2">{post.title}</h1>
         <div className="flex justify-between items-center mb-2 mr-2">
           <h2 className="text-lg font-semibold">Anonymous {post.timestamp ? post.timestamp : 'No timestamp'}</h2>
-          <button onClick={() => handleClick(post.message._id)} className="ml-auto bg-[#242424] text-[#CCCCCC] py-2 px-4 rounded hover:bg-[#3E3F3E]">Reply</button>
+          {!post.locked && <button onClick={() => handleClick(post.message._id)} className="ml-auto bg-[#242424] text-[#CCCCCC] py-2 px-4 rounded hover:bg-[#3E3F3E]">Reply</button>}
           <BurgerMenu isUser={user===post.author} messageId={post.message._id}></BurgerMenu>
         </div>
         <div>{splitMessageContent(message.content)}</div>
-        {message.replies.length > 0 ? (
-        <p className="pt-2 text-gray-300">{post.message.replies.length} messages</p>
+        {post.messages.length > 0 ? (
+        <p className="pt-2 text-gray-300">{post.messages.length} messages</p>
         ) : (
           <p className="pt-2 text-gray-300">No messages</p>
         )}
-        {isAllowed === message._id && !(isElementInViewport('bottom-reply-form', document)) && <ReplyForm topic={topic} post={post._id} isDefault={false}></ReplyForm>}
+        {isAllowed === message._id && !(isElementInViewport('bottom-reply-form', document)) && <ReplyForm topic={topic} post={post._id} isDefault={false} locked={post.locked?true:false}></ReplyForm>}
       </div>
     );
   }
@@ -129,7 +130,7 @@ const Message = ({ post, messages, message, isOP, topic, isTopLevel = true }: Re
       <div className="flex-col gap-4 py-1" key={message._id}>
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-semibold">Anonymous {message.timestamp ? message.timestamp : 'No timestamp'}</h2>
-          {isTopLevel && <button onClick={() => handleClick(message._id)} className="ml-auto bg-[#242424] text-[#CCCCCC] py-2 px-4 rounded hover:bg-[#3E3F3E]">Reply</button>}
+          {isTopLevel && !post.locked && <button onClick={() => handleClick(message._id)} className="ml-auto bg-[#242424] text-[#CCCCCC] py-2 px-4 rounded hover:bg-[#3E3F3E]">Reply</button>}
           {isTopLevel && <BurgerMenu isUser={user===message.author} messageId={message._id}></BurgerMenu>}
           {!isTopLevel && <button onClick={() => scrollToMessage(message._id)} className="ml-auto bg-[#242424] text-[#CCCCCC] py-2 px-4 rounded hover:bg-[#3E3F3E]">Move</button>}
         </div>
@@ -171,7 +172,7 @@ const Message = ({ post, messages, message, isOP, topic, isTopLevel = true }: Re
           )}
         </div>
       )}
-      {isAllowed === message._id && !(isElementInViewport('bottom-reply-form', document)) && <ReplyForm topic={topic} post={post._id} isDefault={false}></ReplyForm>}
+      {isAllowed === message._id && !(isElementInViewport('bottom-reply-form', document)) && <ReplyForm topic={topic} post={post._id} isDefault={false} locked={post.locked?true:false}></ReplyForm>}
       </div>
       );
 };

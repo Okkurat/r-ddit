@@ -50,6 +50,19 @@ const PostPage = async ({ params }: { params: Params }) => {
         ...message,
         replies: message.replies ? message.replies.filter(reply => messageIds.has(reply._id.toString())) : []
       }));
+      if (post.message && post.message.replies) {
+        post.message.replies = post.message.replies.filter(reply => !reply.deleted?.isDeleted);
+      }
+      
+      if (post.message && post.message.replies) {
+        post.message.replies = post.message.replies.filter(reply => !reply.deleted?.isDeleted);
+      }
+      post.messages = post.messages.filter(message => !message.deleted?.isDeleted).map(message => ({
+        ...message,
+        replies: message.replies ? message.replies.filter(reply => !reply.deleted?.isDeleted) : []
+      }));
+      
+
     }
   } catch (error) {
 
@@ -57,8 +70,43 @@ const PostPage = async ({ params }: { params: Params }) => {
     redirect(`/${params.topic}`);
   }
 
-  if (!post) return redirect(`/${params.topic}`);
+  if (!post || post.message.deleted?.isDeleted) return redirect(`/${params.topic}`);
 
+  const splitMessageContent = async (content: string) => {
+    const regex = />>(\w{24})(\s|$|\n)/g;
+  
+    let match: any;
+    let modifiedContent = content;
+    while ((match = regex.exec(content)) !== null) {
+      try {
+        let msg = await Message.findById(match[1]).exec();
+        if (msg) {
+          if (msg.deleted.isDeleted) {
+            console.log("DELETED", msg.id, match[1]);
+            modifiedContent = modifiedContent.replace(match[0], '>>DELETED' + match[2]);
+          }
+        }
+      } catch (error) {
+        return modifiedContent;
+      }
+    }
+    return modifiedContent;
+  };
+  const processPost = async () => {
+    post.message.content = await splitMessageContent(post.message.content);
+    return post;
+  };
+  await processPost();
+  const processMessages = async () => {
+    const processedMessages = await Promise.all(
+      post.messages.map(async (message) => {
+        message.content = await splitMessageContent(message.content);
+        return message;
+      })
+    );
+  };
+  
+  await processMessages();
   
   
   post.timestamp = (new Date(post.timestamp)).toLocaleString();
@@ -77,6 +125,7 @@ const PostPage = async ({ params }: { params: Params }) => {
     });
     return message;
   });
+  post?.messages.filter(message => message.deleted?.isDeleted);
   
   
   const data = JSON.parse(JSON.stringify(post));

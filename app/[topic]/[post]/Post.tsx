@@ -13,11 +13,11 @@ interface PostMainProps {
 }
 
 const Post = ({ post, topic, user }: PostMainProps) => {
-
   const setValue  = useUserSetter();
   useEffect(() => {
     setValue(user);
   }, [user]);
+  let locked = false;
 
   return (
     <div className="bg-[#121212] rounded-lg border-2 border-[#242424]">
@@ -26,7 +26,7 @@ const Post = ({ post, topic, user }: PostMainProps) => {
     </div>
       <div className="bg-[#121212] p-2">
       <Replies topic={topic} post={post} messages={post.messages}></Replies>
-      <ReplyForm topic={topic} post={post._id} isDefault={true}></ReplyForm>
+      <ReplyForm topic={topic} post={post._id} isDefault={true} locked={post.locked?true:false}></ReplyForm>
       </div>
   </div>
   );

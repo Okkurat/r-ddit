@@ -5,6 +5,11 @@ interface IMessage extends Document {
   author: string;
   timestamp: Date;
   replies: mongoose.Schema.Types.ObjectId[];
+  deleted: {
+    timestamp?: Date;
+    isDeleted: boolean;
+  };
+  markAsDeleted: () => void;
 }
 
 const messageSchema: Schema<IMessage> = new mongoose.Schema({
@@ -17,7 +22,17 @@ const messageSchema: Schema<IMessage> = new mongoose.Schema({
     ref: 'Message',
     default: []
   }],
+  deleted: {
+    timestamp: { type: Date, default: null },
+    isDeleted: { type: Boolean, default: false },
+  }
 });
+
+messageSchema.methods.markAsDeleted = function () {
+  this.deleted.timestamp = new Date();
+  this.deleted.isDeleted = true;
+  return this.save();
+};
 
 messageSchema.set('toJSON', {
   transform: (document, returnedObject) => {

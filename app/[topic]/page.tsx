@@ -2,8 +2,9 @@ import Link from 'next/link';
 import { fetchTopicData } from '../server-actions';
 import PostForm from './PostForm';
 import { currentUser } from '@clerk/nextjs/server';
-import { PostPlain, TopicSummary } from '@/lib/types';
+import { MessageWithoutReplies, PostPlain, TopicSummary } from '@/lib/types';
 import { redirect } from 'next/navigation'
+import Message from '@/models/message';
 
 interface Params {
   topic: string
@@ -25,9 +26,46 @@ const TopicPage = async ({ params }: { params: Params }) => {
 
   const topic: TopicSummary | null = response;
   if (!topic) return <div className="text-gray-400">Topic does not exist</div>;
+  topic.posts.map((post: PostPlain) => {
+    post.messages = post.messages.filter((message: MessageWithoutReplies) => {
+      return !(message.deleted?.isDeleted);
+    });
+  });
+
+  const splitMessageContent = async (content: string) => {
+    const regex = />>(\w{24})(\s|$|\n)/g;
+  
+    let match: any;
+    let modifiedContent = content;
+    while ((match = regex.exec(content)) !== null) {
+      try {
+        let msg = await Message.findById(match[1]).exec();
+        if (msg) {
+          if (msg.deleted.isDeleted) {
+            console.log("DELETED", msg.id, match[1]);
+            modifiedContent = modifiedContent.replace(match[0], '>>DELETED' + match[2]);
+          }
+        }
+      } catch (error) {
+        return modifiedContent;
+      }
+    }
+    return modifiedContent;
+  };
+
+  topic.posts = topic.posts.filter((post: PostPlain) => {
+    return !(post.message.deleted?.isDeleted);
+  });
+  
   topic.posts.sort((a: PostPlain, b: PostPlain) => {
     return b.latestPost.getTime()- a.latestPost.getTime();
   });
+  await Promise.all(
+    topic.posts.map(async (post: PostPlain) => {
+      post.message.content = await splitMessageContent(post.message.content);
+    })
+  );
+
   return (
     <div className="max-w-7xl mx-auto p-4 bg-[#121212] text-[#CCCCCC] rounded-lg border-2 border-[#242424]">
       <div className="mb-8">

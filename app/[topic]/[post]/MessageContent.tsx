@@ -22,7 +22,6 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
   const [topic, setTopic] = useState<string>('');
   const [postId, setPostId] = useState<string>('');
 
-  //console.log("HEELLO", post, messageId, messages);
 
   useEffect(() => {
     setDivIsLoading(true);
@@ -63,6 +62,7 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
     const y = event.pageY;
     setPosition({ x, y });
     setCurrentID(messageId);
+    console.log(messageId);
     setShowDiv(true);
   };
 
@@ -85,6 +85,7 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
 
 
   const message = messages.find((msg) => msg._id === messageId);
+  
     if (message) {
       const timestamp = message.timestamp = (new Date(message.timestamp)).toLocaleString('en-US');
       return (
@@ -137,7 +138,7 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
           onMouseLeave={() => setShowDiv(false)}
           className="inline-block text-blue-500 cursor-default"
         >
-          {topic && postId ? (
+          {topic && postId && !pointedPost.deleted.isDeleted ?  (
             <Link href={`/${topic}/${postId}/#${messageId}`}>
               {">>>post"}
             </Link>
