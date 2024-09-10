@@ -1,4 +1,4 @@
-import { deleteMessage } from "@/app/actions";
+import { createReport, deleteMessage } from "@/app/actions";
 import React, { FormEvent, useEffect, useRef, useState } from "react"
 
 interface BurgerMenuProps {
@@ -44,10 +44,19 @@ const BurgerMenu = ({isUser, messageId} : BurgerMenuProps) => {
 
   const handleReportClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
-    console.log(formData);
     console.log(reportDetails, reportReason, messageId);
-    setShowReportDialog(false);
+    try {
+      const { error, success } = await createReport(reportDetails, reportReason, messageId);
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log(success);
+      setShowReportDialog(false);
+    } catch (error) {
+      console.error("Failed to create report", error);
+    }
+
   }
   const handleHideClick = () => {
     console.log("Hide button clicked", messageId)

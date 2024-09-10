@@ -28,6 +28,14 @@ export interface MessageData {
   content: string;
   author: string;
 }
+export interface ReportData {
+  reportDetails: string;
+  reportReason: string;
+  message: string;
+  author: string
+  topic: string;
+  post: string;
+}
 
 export interface Post {
   _id: string;

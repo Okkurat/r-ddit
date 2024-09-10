@@ -21,7 +21,7 @@ const TopicPage = async ({ params }: { params: Params }) => {
 
   if ('error' in response) {
     console.error('Error fetching topic:', response.error);
-    redirect('/error');
+    redirect('/');
   }
 
   const topic: TopicSummary | null = response;

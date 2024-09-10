@@ -4,10 +4,72 @@ import connectDB from "@/lib/mongoose";
 import Message from "@/models/message";
 import Post from "@/models/post";
 import Topic from "@/models/topic";
-import { MessageData, PostData, Post as PostType, Message as MessageType, TopicType } from '@/lib/types';
+import Report from "@/models/report";
+import { MessageData, PostData, TopicType, ReportData } from '@/lib/types';
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+
+export async function createReport(reportDetails: string, reportReason: string, messageId: string) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { error: 'User does not exist' };
+    }
+    await connectDB();
+    const schema = z.object({
+      reportDetails: z.string(),
+      messageId: z.string(),
+      reportReason: z.string()
+    });
+    const parse = schema.safeParse({
+      reportDetails,
+      reportReason,
+      messageId,
+    });
+    if(!parse.success){
+      return { error: 'Invalid input data' };
+    }
+    const message = await Message.findById(messageId).exec();
+    if (!message) {
+      return { error: 'Message not found' };
+    }
+
+    let post: any = await Post.findOne({ messages: messageId }).exec();
+    if(!post){
+      post = await Post.findOne({ message: messageId }).exec();
+      if (!post) {
+        return { error: 'Post containing this message not found' };
+      }
+    }
+    const topic = await Topic.findOne({ posts: post._id }).exec();
+    if (!topic) {
+      return { error: 'Topic containing this post not found'};
+    }
+
+    const reportData: ReportData = {
+      reportDetails: reportDetails,
+      reportReason: reportReason,
+      author: message.author,
+      message: messageId,
+      topic: topic.name,
+      post: post._id.toString(),
+    };
+    const newReport = new Report(reportData);
+    await newReport.save();
+    return { success: 'Report created' };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message || 'Failed to create report'
+      };
+    } else {
+      return {
+        error: 'Unexpected error' || 'Failed to create report'
+      };
+    }
+  }
+}
 
 export async function createTopic(prevState: unknown, formData: FormData) {
   try {
