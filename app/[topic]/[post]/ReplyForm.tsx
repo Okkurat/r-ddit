@@ -2,7 +2,7 @@
 import { createMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
 import { isElementInViewport } from "@/lib/utils";
-import { FormEvent, useState, useRef, useEffect, FC, use } from "react";
+import { FormEvent, useState, useRef, useEffect, FC } from "react";
 
 interface Params {
   post: string;

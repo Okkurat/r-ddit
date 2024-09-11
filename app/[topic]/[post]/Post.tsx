@@ -16,8 +16,7 @@ const Post = ({ post, topic, user }: PostMainProps) => {
   const setValue  = useUserSetter();
   useEffect(() => {
     setValue(user);
-  }, [user]);
-  let locked = false;
+  }, [setValue, user]);
 
   return (
     <div className="bg-[#121212] rounded-lg border-2 border-[#242424]">
