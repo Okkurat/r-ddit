@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 
 interface IMessage extends Document {
+  userId: number;
   content: string;
   author: string;
   timestamp: Date;
@@ -25,7 +26,8 @@ const messageSchema: Schema<IMessage> = new mongoose.Schema({
   deleted: {
     timestamp: { type: Date, default: null },
     isDeleted: { type: Boolean, default: false },
-  }
+  },
+  userId: { type: Number, required: true }
 });
 
 messageSchema.methods.markAsDeleted = function () {

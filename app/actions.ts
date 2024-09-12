@@ -5,7 +5,7 @@ import Message from "@/models/message";
 import Post from "@/models/post";
 import Topic from "@/models/topic";
 import Report from "@/models/report";
-import { MessageData, PostData, TopicType, ReportData } from '@/lib/types';
+import { MessageData, PostData, TopicType, ReportData, Message as MessageType } from '@/lib/types';
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -136,14 +136,38 @@ export async function createMessage(props: MessageProps){
     if (!topic) {
       return { error: 'Topic not found' };
     }
+
+    const post: any = await Post.findById(props.post)
+    .populate('message', '', Message)
+    .populate('messages', '', Message);
+    if(!post){
+      return { error: 'Post not found' };
+    }
+    console.log("POST", post);
+    console.log("POST MESSAGE",post.message);
+    console.log("POST MESSAGE AUTHOR", post.message.author);
+    console.log("POST MESSAGES", post.messages);
+    let userId = 0;
+    if(post.message.author !== user.id){
+      const uniqueMessages = new Set(post.messages.map((message: MessageType) => message.author));
+      if(uniqueMessages.has(user.id)){
+        userId = post.messages.find((message: MessageType) => message.author === user.id).userId;
+      }
+      else {
+        userId = post.uniques + 1;
+        post.uniques += 1;
+      }
+      console.log("POST Uniques", post.uniques);
+      console.log("HERE", uniqueMessages);
+      console.log("USERID", userId);
+    }
     const newMessageData: MessageData = {
       content: props.message,
-      author: user.id
+      author: user.id,
+      userId
     };
     console.log(props.post);
     const newMessage = new Message(newMessageData);
-    const post = await Post.findById(props.post).populate('message', '', Message);
-    console.log("HERE");
 
     if(!post){
       return { error: 'Post not found' };
@@ -156,7 +180,7 @@ export async function createMessage(props: MessageProps){
     post.latestPost = newMessage.timestamp;
     let count = 0;
     for (const message of post.messages) {
-      const msg = await Message.findById(message.toString()).lean().exec();
+      const msg = await Message.findById(message._id.toString()).lean().exec();
       if (!msg?.deleted?.isDeleted) {
         count++;
         console.log(count);
@@ -275,6 +299,7 @@ export async function fetchMessageWithPostAndTopic(messageId: string) {
     }
     
     await connectDB();
+    let isOp = false;
     
     const message = await Message.findById(messageId).exec();
     if (!message) {
@@ -284,6 +309,7 @@ export async function fetchMessageWithPostAndTopic(messageId: string) {
     post = await Post.findOne({ messages: message._id }).exec();
     if(!post){
       post = await Post.findOne({ message: message._id }).exec();
+      isOp = true;
     }
     if (!post) {
       return { error: 'Post containing this message not found' };
@@ -293,11 +319,13 @@ export async function fetchMessageWithPostAndTopic(messageId: string) {
     if (!topic) {
       return { error: 'Topic containing this post not found'};
     }
+    console.log(post);
     
     return {
       message: JSON.parse(JSON.stringify(message)),
       post: post.id,
-      topic: topic.name, // This will work due to the transformation in your schema
+      isOp: isOp,
+      topic: topic.name,
     };
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -348,7 +376,8 @@ export async function createPost(props: PostProps) {
     }
     const newMessageData: MessageData = {
       content: props.message,
-      author: user.id
+      author: user.id,
+      userId: 0,
     };
     const newMessage = new Message(newMessageData);
     const savedMessage = await newMessage.save();

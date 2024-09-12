@@ -129,6 +129,7 @@ const PostPage = async ({ params }: { params: Params }) => {
   
   
   const data = JSON.parse(JSON.stringify(post));
+  console.log(data);
 
   return (
     <PostMain params={params} post={data} user={user.id}></PostMain>

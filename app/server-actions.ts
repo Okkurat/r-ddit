@@ -17,7 +17,7 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
     .populate<TopicSummary>({
       path: 'posts',
       model: Post,
-      select: 'title message author messages timestamp latestPost deleted',
+      select: 'title message author messages timestamp latestPost deleted uniques',
       populate: [
         {
           path: 'message',
@@ -50,7 +50,8 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
           deleted: {
             timestamp: post.message.deleted?.timestamp,
             isDeleted: post.message.deleted?.isDeleted
-          }
+          },
+          userId: post.message.userId
         },
         author: post.author,
         messages: post.messages.map((message: MessageWithoutReplies) => ({
@@ -61,10 +62,12 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
           deleted: {
             timestamp: message.deleted?.timestamp,
             isDeleted: message.deleted?.isDeleted
-          }
+          },
+          userId: message.userId
         })),
         timestamp: post.timestamp,
         latestPost: post.latestPost,
+        uniques: post.uniques
       })),
     };
 

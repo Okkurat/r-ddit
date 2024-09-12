@@ -8,6 +8,7 @@ interface IPost extends Document {
   timestamp: Date;
   latestPost: Date;
   locked: boolean;
+  uniques: number;
 }
 
 const postSchema: Schema<IPost> = new mongoose.Schema({
@@ -27,6 +28,7 @@ const postSchema: Schema<IPost> = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now },
   latestPost: { type: Date, default: Date.now },
   locked: { type: Boolean, default: false },
+  uniques: { type: Number, default: 0 },
 });
 
 postSchema.set('toJSON', {

@@ -51,7 +51,8 @@ const ReplyForm: FC<Params> = ({ topic, post, isDefault, locked=false }) => {
 
     const replies = matches.map(match => match.slice(2));
     try {
-      const { error } = await createMessage({ message: value, topic, post, replies });
+      await createMessage({ message: value, topic, post, replies });
+      //const { error } = await createMessage({ message: value, topic, post, replies });
       if (error) {
         setError(error);
         return;

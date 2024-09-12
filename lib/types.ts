@@ -27,6 +27,7 @@ export interface PostData {
 export interface MessageData {
   content: string;
   author: string;
+  userId: number;
 }
 export interface ReportData {
   reportDetails: string;
@@ -66,6 +67,7 @@ export interface PostPlain {
   messages: MessageWithoutReplies[];
   timestamp: string;
   latestPost: Date;
+  uniques: number;
 }
 export interface TopicSummary {
   id: string;
@@ -83,6 +85,7 @@ export interface Message {
     timestamp?: Date;
     isDeleted?: boolean;
   };
+  userId: number;
 }
 
 export type MessageWithoutReplies = Omit<Message, 'replies'>;

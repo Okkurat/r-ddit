@@ -21,6 +21,7 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
   const [pointedPost, setPointedPost] = useState<any>(null);
   const [topic, setTopic] = useState<string>('');
   const [postId, setPostId] = useState<string>('');
+  const [isOp, setIsOp] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -34,7 +35,7 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
     }
     const fetchMessage = async () => {
       try {
-        const { message, post, topic, error } = await fetchMessageWithPostAndTopic(currentID);
+        const { message, post, topic, error, isOp } = await fetchMessageWithPostAndTopic(currentID);
         if (error) {
           console.log(error);
           return null;
@@ -43,6 +44,8 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
         setPointedPost(message);
         setPostId(post || '');
         setTopic(topic || '');
+        setIsOp(isOp || false);
+        console.log("isOp", isOp);
         console.log(message, post, topic);
         return message;
       } catch (error) {
@@ -53,7 +56,7 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
     };
   
     fetchMessage();
-  }, [currentID, pointedPost?.id, showDiv]);
+  }, [currentID, messageId, pointedPost?.id, showDiv]);
 
 
 
@@ -62,7 +65,7 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
     const y = event.pageY;
     setPosition({ x, y });
     setCurrentID(messageId);
-    console.log(messageId);
+    console.log(messageId, postId);
     setShowDiv(true);
   };
 
@@ -120,7 +123,7 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
           >
         <div className="relative bg-[#242424] rounded-lg flex-col gap-2">
         <div className="flex flex-col gap-0 mb-0">
-            <p className="font-semibold">Anonymous {post.timestamp ? timestamp : 'No timestamp'}</p>
+            <p className="font-semibold">OP {post.timestamp ? timestamp : 'No timestamp'}</p>
           </div>
           <div>{parseIndepMessage(post.message.content)}</div>
         <div className=" border-l-2 border-gray-600"></div>
@@ -160,7 +163,7 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
               >
             <div className="relative bg-[#242424] rounded-lg flex-col gap-2">
             <div className="flex flex-col gap-0 mb-0">
-                <p className="font-semibold">Anonymous {pointedPost?.timestamp ? pointedPost.timestamp : 'No timestamp'}</p>
+                <p className="font-semibold">{isOp ? 'OP' : ''} {pointedPost?.timestamp ? pointedPost.timestamp : 'No timestamp'}</p>
               </div>
               {pointedPost?.content ? <div>{parseIndepMessage(pointedPost.content)} </div> : null}
             <div className=" border-l-2 border-gray-600"></div>

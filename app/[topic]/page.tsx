@@ -65,6 +65,10 @@ const TopicPage = async ({ params }: { params: Params }) => {
       post.message.content = await splitMessageContent(post.message.content);
     })
   );
+  const uniquePosters = new Set(topic.posts.map(post => post.author));
+  topic.posts.map((post: PostPlain) => {
+    console.log(post);
+  });
 
   return (
     <div className="max-w-7xl mx-auto p-4 bg-[#121212] text-[#CCCCCC] rounded-lg border-2 border-[#242424]">
@@ -84,6 +88,8 @@ const TopicPage = async ({ params }: { params: Params }) => {
                 <h2 className="text-sm text-[#CCCCCC] font-semibold mb-1 truncate">{post.title || 'Untitled'}</h2>
                 <p className="text-xs text-[#CCCCCC] mb-1 line-clamp-3">{post.message.content}</p>
                 <small className="text-xs text-gray-300">Posts: {post.messages.length}</small>
+                <br></br>
+                <small className='text-xs text-gray-300'>Unique posts: {post.messages.length !== 0 ? post.uniques + 1 : post.uniques}</small>
               </div>
             </Link>
           ))
