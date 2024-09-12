@@ -1,6 +1,6 @@
 import { findMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
-import { Message as MessageType, Post, Reply} from '@/lib/types';
+import { Message as MessageType, Post, Reply} from "@/types/types";
 import { isElementInViewport, scrollToMessage } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import MessageContent from "./MessageContent";

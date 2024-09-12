@@ -1,7 +1,7 @@
 'use client';
 import { useState, FormEvent, useRef, useEffect } from 'react';
 import { createPost } from './actions';
-import { TopicType } from '@/lib/types';
+import { TopicType } from "@/types/types";
 import { useRouter } from 'next/navigation';
 
 interface CreatePostProps {

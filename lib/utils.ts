@@ -1,5 +1,3 @@
-import Message from "@/models/message";
-
 export const isElementInViewport = (id: string, document: Document): boolean => {
   const element = document.getElementById(id);
   if (element) {

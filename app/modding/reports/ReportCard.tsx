@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Report } from "@/lib/types";
+import { Report } from "@/types/types";
 
 interface ReportCardProps {
   report: Report;

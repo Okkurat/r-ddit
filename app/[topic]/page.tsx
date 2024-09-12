@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { fetchTopicData } from '../server-actions';
 import PostForm from './PostForm';
 import { currentUser } from '@clerk/nextjs/server';
-import { MessageWithoutReplies, PostPlain, TopicSummary } from '@/lib/types';
+import { MessageWithoutReplies, PostPlain, TopicSummary } from "@/types/types";
 import { redirect } from 'next/navigation';
 import Message from '@/models/message';
 
@@ -65,11 +65,10 @@ const TopicPage = async ({ params }: { params: Params }) => {
       post.message.content = await splitMessageContent(post.message.content);
     })
   );
-  const uniquePosters = new Set(topic.posts.map(post => post.author));
   topic.posts.map((post: PostPlain) => {
     console.log(post);
   });
-
+  
   return (
     <div className="max-w-7xl mx-auto p-4 bg-[#121212] text-[#CCCCCC] rounded-lg border-2 border-[#242424]">
       <div className="mb-8">

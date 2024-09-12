@@ -1,9 +1,11 @@
 import React from 'react';
 import Report from '@/models/report';
-import { Report as ReportType } from '@/lib/types';
+import { Report as ReportType } from "@/types/types";
 import { currentUser } from '@clerk/nextjs/server';
 import connectDB from '@/lib/mongoose';
 import ReportCard from './ReportCard';
+import { redirect } from 'next/navigation';
+import { checkRole } from '@/app/server-actions';
 
 const ReportsPage = async () => {
   const reports = await Report.find({}).lean().exec();
@@ -12,6 +14,9 @@ const ReportsPage = async () => {
 
   if (!user) {
     return <div>Error</div>;
+  }
+  if (!checkRole('admin')) {
+    redirect('/')
   }
   try {
     await connectDB();

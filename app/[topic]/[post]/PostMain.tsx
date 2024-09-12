@@ -1,5 +1,5 @@
 'use client';
-import { Post as PostType } from '@/lib/types';
+import { Post as PostType } from "@/types/types";
 import { MessageProvider } from '@/lib/MessageContext';
 import { UserProvider } from '@/lib/UserContext';
 import Post from './Post';

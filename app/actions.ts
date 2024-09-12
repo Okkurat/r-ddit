@@ -5,7 +5,7 @@ import Message from "@/models/message";
 import Post from "@/models/post";
 import Topic from "@/models/topic";
 import Report from "@/models/report";
-import { MessageData, PostData, TopicType, ReportData, Message as MessageType } from '@/lib/types';
+import { MessageData, PostData, TopicType, ReportData, Message as MessageType } from "@/types/types";
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";

@@ -1,6 +1,6 @@
 import Replies from "./Replies";
 import Message from "./Message";
-import { Post as PostType } from '@/lib/types';
+import { Post as PostType } from "@/types/types";
 import ReplyForm from "./ReplyForm";
 import { useEffect } from "react";
 import { useUserSetter } from "@/lib/UserContext";
