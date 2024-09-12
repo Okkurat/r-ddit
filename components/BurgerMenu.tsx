@@ -4,6 +4,7 @@ import MenuIcon from "./MenuIcon";
 import DeleteDialog from "./DeleteDialog";
 import ReportDialog from "./ReportDialog";
 import MenuOptions from "./MenuOptions";
+import ModDialog from "./ModeDialog";
 
 interface BurgerMenuProps {
   isUser: boolean;
@@ -14,6 +15,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isUser, messageId }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
+  const [showModDialog, setShowModDialog] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,6 +47,10 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isUser, messageId }) => {
       console.error("Failed to create report", error);
     }
   };
+
+  const handleModSubmit = async (BanReason: string, banDetails: string) => {
+    console.log("Ban button clicked", messageId, BanReason, banDetails);
+  }
 
   const handleHideClick = () => {
     console.log("Hide button clicked", messageId);
@@ -79,6 +85,7 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isUser, messageId }) => {
             onReport={() => setShowReportDialog(true)}
             onHide={handleHideClick}
             onDelete={() => setShowDeleteDialog(true)}
+            onBan={() => setShowModDialog(true)}
           />
         )}
       </div>
@@ -92,6 +99,12 @@ const BurgerMenu: React.FC<BurgerMenuProps> = ({ isUser, messageId }) => {
         <ReportDialog
           onClose={() => setShowReportDialog(false)}
           onSubmit={handleReportSubmit}
+        />
+      )}
+      {showModDialog && (
+        <ModDialog
+          onClose={() => setShowModDialog(false)}
+          onSubmit={handleModSubmit}
         />
       )}
     </div>
