@@ -5,7 +5,7 @@ interface ReportCardProps {
   report: Report;
 }
 
-const ReportCard = ({ report } :ReportCardProps) => (
+const ReportCard = ({ report } : ReportCardProps) => (
   <div className="bg-[#121212] p-4 rounded-lg mb-4 border border-[#242424]">
     <h2 className="text-xl font-semibold mb-2">{report.reportDetails}</h2>
     <p><strong>Reason:</strong> {report.reportReason}</p>

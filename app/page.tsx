@@ -3,7 +3,7 @@ import '../lib/mongoose';
 import connectDB from '../lib/mongoose';
 import Topic from '@/models/topic';
 import CreatePost from './CreatePost';
-import { TopicType } from '@/lib/types';
+import { TopicType } from '@/types/types';
 import TopicForm from './TopicForm';
 
 const HomePage = async () => {
@@ -15,7 +15,7 @@ const HomePage = async () => {
   let topics: TopicType[] = [];
   try {
     await connectDB();
-    const topicsFromDB = await Topic.find();
+    const topicsFromDB = await Topic.find().lean();
     topics = topicsFromDB.map(topic => ({
       name: topic.name,
     }));

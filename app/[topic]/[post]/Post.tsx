@@ -2,19 +2,23 @@ import Replies from "./Replies";
 import Message from "./Message";
 import { Post as PostType } from "@/types/types";
 import ReplyForm from "./ReplyForm";
-import { useEffect } from "react";
-import { useUserSetter } from "@/lib/UserContext";
+import { use, useEffect } from "react";
+import { useSetIsMod, useUserSetter } from "@/lib/UserContext";
 
-
-interface PostMainProps {
+interface PostProps {
   post: PostType;
   topic: string;
   user: string;
+  isMod: boolean;
 }
 
-const Post = ({ post, topic, user }: PostMainProps) => {
-  const setValue  = useUserSetter();
+const Post = ({ post, topic, user, isMod }: PostProps) => {
+  const setValue = useUserSetter();
+  const setMod = useSetIsMod();
   useEffect(() => {
+    if(isMod) {
+      setMod(true);
+    }
     setValue(user);
   }, [setValue, user]);
 

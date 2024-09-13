@@ -1,4 +1,4 @@
-import { Message as MessageType, Post } from '@/lib/types';
+import { Message as MessageType, Post } from '@/types/types';
 import React from "react";
 import Message from "./Message";
 

@@ -6,6 +6,7 @@ import PostMain from './PostMain';
 import React from "react";
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
+import { checkRole } from '@/app/server-actions';
 
 interface Params {
   post: string;
@@ -15,8 +16,12 @@ interface Params {
 const PostPage = async ({ params }: { params: Params }) => {
 
   const user = await currentUser();
+  let isMod = false;
   if (!user) {
     return <div>Error</div>;
+  }
+  if(checkRole('admin')){
+    isMod = true;
   }
 
   let post: PostType | null = null;
@@ -132,7 +137,7 @@ const PostPage = async ({ params }: { params: Params }) => {
   console.log(data);
 
   return (
-    <PostMain params={params} post={data} user={user.id}></PostMain>
+    <PostMain params={params} post={data} user={user.id} isMod={isMod}></PostMain>
   );
 };
 

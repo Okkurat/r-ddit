@@ -2,7 +2,6 @@
 import { fetchMessageWithPostAndTopic } from "@/app/actions";
 import { Message, Post } from "@/types/types";
 import { scrollToMessage } from "@/lib/utils";
-import { set } from "mongoose";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -74,7 +73,7 @@ const MessageContent = ({post, messageId, messages }: MessageContentProps) => {
     return parts.map((part, index) => {
       const match = part.match(/>>(\w{24})/);
       if (match) {
-        return <div key={index} className="block text-blue-500">{">>"}post</div>;
+        //return <div key={index} className="block text-blue-500">{">>"}post</div>;
       }
       else if (!part.match(/(\w{24})/)) {
         const match = part.match(/(\w{24})/);

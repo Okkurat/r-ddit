@@ -7,7 +7,7 @@ interface PostFormProps {
   topic: string
 }
 
-const PostForm = (props: PostFormProps) => {
+const PostForm = ({ topic}: PostFormProps) => {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,14 +31,14 @@ const PostForm = (props: PostFormProps) => {
       const { savedPost, error } = await createPost({
         message,
         title: title || undefined,
-        topic: { name: props.topic },
+        topic: { name: topic },
       });
       if (error) {
         setError('User not logged in!');
         return;
       }
       if (savedPost && savedPost.id) {
-        router.push(`/${props.topic}/${savedPost.id}`);
+        router.push(`/${topic}/${savedPost.id}`);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

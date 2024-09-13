@@ -11,7 +11,7 @@ interface BurgerMenuProps {
   messageId: string;
 }
 
-const BurgerMenu: React.FC<BurgerMenuProps> = ({ isUser, messageId }) => {
+const BurgerMenu = ({ isUser, messageId }: BurgerMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);

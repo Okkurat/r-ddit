@@ -50,9 +50,15 @@ const ReplyForm: FC<Params> = ({ topic, post, isDefault, locked=false }) => {
     const matches = value.match(regex) || [];
 
     const replies = matches.map(match => match.slice(2));
+
+    const strippedValue = value.replace(regex, '').trim();
+    if (strippedValue === '') {
+      setError('Message cannot be empty after removing replies');
+      setLoading(false);
+      return;
+    }
     try {
-      await createMessage({ message: value, topic, post, replies });
-      //const { error } = await createMessage({ message: value, topic, post, replies });
+      const { error } = await createMessage({ message: value, topic, post, replies });
       if (error) {
         setError(error);
         return;
