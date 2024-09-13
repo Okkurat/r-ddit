@@ -34,7 +34,11 @@ const PostForm = ({ topic}: PostFormProps) => {
         topic: { name: topic },
       });
       if (error) {
-        setError('User not logged in!');
+        if(error === 'You are banned'){  
+          console.log("BANNED");
+          router.push("/banned")
+        }
+        setError(error);
         return;
       }
       if (savedPost && savedPost.id) {

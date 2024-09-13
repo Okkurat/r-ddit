@@ -5,10 +5,7 @@ interface IBan extends Document {
   reason: string;
   details: string;
   bannedUntil: Date;
-  prevBan: {
-    timestamp: Date;
-    banDuration: number;
-  }
+  message: mongoose.Schema.Types.ObjectId;
 }
 
 const banSchema: Schema<IBan> = new mongoose.Schema({
@@ -16,9 +13,10 @@ const banSchema: Schema<IBan> = new mongoose.Schema({
   reason: { type: String, required: true },
   details: { type: String, required: true },
   bannedUntil: { type: Date, required: true },
-  prevBan: {
-    timestamp: { type: Date, required: true },
-    banDuration: { type: Number, required: true },
+  message: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: false,
+    ref: 'Message'
   },
 });
 

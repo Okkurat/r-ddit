@@ -2,7 +2,7 @@ import Replies from "./Replies";
 import Message from "./Message";
 import { Post as PostType } from "@/types/types";
 import ReplyForm from "./ReplyForm";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import { useSetIsMod, useUserSetter } from "@/lib/UserContext";
 
 interface PostProps {

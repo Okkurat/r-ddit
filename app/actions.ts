@@ -9,6 +9,7 @@ import { MessageData, PostData, TopicType, ReportData, Message as MessageType } 
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import Ban from "@/models/ban";
 
 export async function createReport(reportDetails: string, reportReason: string, messageId: string) {
   try {
@@ -119,6 +120,10 @@ export async function createMessage(props: MessageProps){
       return { error: 'User does not exist' };
     }
     await connectDB();
+    const isBanned = await Ban.findOne({ userId: user.id }).exec();
+    if(isBanned){
+      return { error: 'You are banned' };
+    }
     const schema = z.object({
       content: z.string().min(1, {message: 'Content must be at least 1 chraracter long'}),
       author: z.string(),
@@ -340,6 +345,62 @@ export async function fetchMessageWithPostAndTopic(messageId: string) {
   }
 }
 
+interface BanProps {
+  messageId: string;
+  reason: string;
+  details: string;
+}
+
+export async function banUser({ messageId, reason, details }: BanProps) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { error: 'User does not exist' };
+    }
+    await connectDB();
+
+    const schema = z.object({
+      messageId: z.string(),
+      reason: z.string(),
+      details: z.string()
+    });
+    const parse = schema.safeParse({
+      messageId,
+      reason,
+      details
+    });
+    if(!parse.success){
+      return { error: 'Invalid input data' };
+    }
+
+    const userr = await Message.findById(messageId).exec();
+    if(!userr){  
+      return { error: 'Message not found' };
+    }
+    userr.markAsDeleted();
+    const ban = new Ban({
+      message: messageId,
+      userId: userr.author,
+      reason,
+      details,
+      bannedUntil: new Date(Date.now() + 1000 * 60 * 60 * 24),
+    });
+    await ban.save();
+    await userr.save();
+    return { success: 'User banned' };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message || 'Failed to ban user'
+      };
+    } else {
+      return {
+        error: 'Unexpected error' || 'Failed to ban user'
+      };
+    }
+  }
+}
+
 interface PostProps {
   title?: string;
   message: string;
@@ -353,6 +414,10 @@ export async function createPost(props: PostProps) {
       return { error: 'User does not exist' };
     }
     await connectDB();
+    const isBanned = await Ban.findOne({ userId: user.id }).exec();
+    if(isBanned){
+      return { error: 'You are banned' };
+    }
 
     const schema = z.object({
       content: z.string().min(1, { message: 'Topic must be at least 1 characters long'}),

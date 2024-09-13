@@ -1,4 +1,4 @@
-import { createReport, deleteMessage } from "@/app/actions";
+import { banUser, createReport, deleteMessage } from "@/app/actions";
 import React, { useEffect, useRef, useState } from "react";
 import MenuIcon from "./MenuIcon";
 import DeleteDialog from "./DeleteDialog";
@@ -48,9 +48,26 @@ const BurgerMenu = ({ isUser, messageId }: BurgerMenuProps) => {
     }
   };
 
-  const handleModSubmit = async (BanReason: string, banDetails: string) => {
-    console.log("Ban button clicked", messageId, BanReason, banDetails);
-  }
+  const handleModSubmit = async (reason: string, details: string) => {
+    console.log("Ban button clicked", messageId, reason, details);
+    try {
+      const { error, success } = await banUser({
+        messageId,
+        reason,
+        details
+      });
+      if (error) {
+        console.error(error);
+        return;
+      }
+      console.log(success);
+      setShowModDialog(false);
+    } catch (error) {
+      console.error("Failed to ban user", error);
+    } finally {
+      setShowModDialog(false);
+    }
+  };
 
   const handleHideClick = () => {
     console.log("Hide button clicked", messageId);
