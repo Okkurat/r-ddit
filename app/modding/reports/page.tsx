@@ -8,27 +8,39 @@ import { redirect } from 'next/navigation';
 import { checkRole } from '@/app/server-actions';
 
 const ReportsPage = async () => {
-  const reports = await Report.find({}).lean().exec();
+  let reports = null;
   const user = await currentUser();
-  let data : ReportType[];
-
+  
   if (!user) {
     return <div>Error</div>;
   }
+  
   if (!checkRole('admin')) {
-    redirect('/')
+    redirect('/');
   }
+  
   try {
     await connectDB();
-    const reports = await Report.find({}).lean().exec();
-    if(!reports){ return <div>No reports available</div>; }
+    reports = await Report.find({}).lean().exec();
+    if (!reports) {
+      return <div>No reports available</div>;
+    }
   } catch (error) {
     console.error('Error fetching reports:', error);
     return <div>Error</div>;
-  } finally { 
-    data = JSON.parse(JSON.stringify(reports));
-
   }
+
+  let data: ReportType[] = JSON.parse(JSON.stringify(reports));
+
+  if (!data || data.length === 0) {
+    return <div>No reports available</div>;
+  }
+
+  data.map((report: ReportType) => {
+    report.timestamp = new Date(report.timestamp).toLocaleString();
+    return report;
+  });
+
   const sortedReports = data.sort((a, b) => a.reportReason.localeCompare(b.reportReason));
 
   return (

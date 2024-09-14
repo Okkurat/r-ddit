@@ -69,10 +69,6 @@ const BurgerMenu = ({ isUser, messageId }: BurgerMenuProps) => {
     }
   };
 
-  const handleHideClick = () => {
-    console.log("Hide button clicked", messageId);
-  };
-
   const handleDeleteClick = async () => {
     try {
       if (!isUser) {
@@ -100,7 +96,6 @@ const BurgerMenu = ({ isUser, messageId }: BurgerMenuProps) => {
           <MenuOptions
             isUser={isUser}
             onReport={() => setShowReportDialog(true)}
-            onHide={handleHideClick}
             onDelete={() => setShowDeleteDialog(true)}
             onBan={() => setShowModDialog(true)}
           />

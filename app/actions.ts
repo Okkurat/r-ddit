@@ -10,6 +10,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import Ban from "@/models/ban";
+import { checkRole } from "./server-actions";
 
 export async function createReport(reportDetails: string, reportReason: string, messageId: string) {
   try {
@@ -481,3 +482,73 @@ export async function createPost(props: PostProps) {
     }
   }
 };
+
+interface DeleteReportProps {
+  reportId: string;
+}
+
+export async function deleteReport({ reportId } : DeleteReportProps) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { error: 'User does not exist' };
+    }
+    if (!checkRole('admin')) {
+      return { error: 'You do not have permission to delete reports' };
+    }
+    await connectDB();
+    const report = await Report.findById(reportId).exec();
+    if (!report) {
+      return { error: 'Report not found' };
+    }
+    await Report.deleteOne({ _id: reportId });
+    revalidatePath('/modding/reports');
+    return { success: 'Report deleted successfully' };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message || 'Failed to delete report'
+      };
+    }
+    else {
+      return {
+        error: 'Unexpected error' || 'Failed to delete report'
+      };
+    }
+  }
+};
+
+interface UnBanProps {
+  banId: string;
+}
+
+export async function unBanUser({ banId }: UnBanProps) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { error: 'User does not exist' };
+    }
+    if (!checkRole('admin')) {
+      return { error: 'You do not have permission to delete reports' };
+    }
+    await connectDB();
+    const ban = await Ban.findById(banId).exec();
+    if (!ban) {
+      return { error: 'Ban not found' };
+    }
+    await Ban.deleteOne({ _id: banId });
+    await ban.save();
+    revalidatePath('/modding/bans');
+    return { success: 'User unbanned' };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message || 'Failed to unban user'
+      };
+    } else {
+      return {
+        error: 'Unexpected error' || 'Failed to unban user'
+      };
+    }
+  }
+}; 

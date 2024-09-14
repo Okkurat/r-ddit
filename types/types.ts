@@ -46,7 +46,7 @@ export interface Report {
   author: string;
   topic: string;
   post: string;
-  timestamp: Date;
+  timestamp: string;
 }
 
 export interface Post {
@@ -86,6 +86,15 @@ export interface Message {
     isDeleted?: boolean;
   };
   userId: number;
+}
+
+export interface Ban {
+  userId: string;
+  _id: string;
+  reason: string;
+  details: string;
+  bannedUntil: string;
+  message: Message;
 }
 
 export type MessageWithoutReplies = Omit<Message, 'replies'>;

@@ -4,12 +4,11 @@ import React from 'react';
 interface MenuOptionsProps {
   isUser: boolean;
   onReport: () => void;
-  onHide: () => void;
   onDelete: () => void;
   onBan: () => void;
 }
 
-const MenuOptions = ({ isUser, onReport, onHide, onDelete, onBan }: MenuOptionsProps) => {
+const MenuOptions = ({ isUser, onReport, onDelete, onBan }: MenuOptionsProps) => {
 
   const isMod = useIsMod();
 
@@ -18,11 +17,6 @@ const MenuOptions = ({ isUser, onReport, onHide, onDelete, onBan }: MenuOptionsP
       <button className="w-full px-4 py-2 text-[#CCCCCC] bg-[#242424] hover:bg-[#3E3F3E] rounded-md" onClick={onReport}>
         Report
       </button>
-      {!isUser && (
-        <button className="w-full px-4 py-2 text-[#CCCCCC] bg-[#242424] hover:bg-[#3E3F3E] rounded mt-2" onClick={onHide}>
-          Hide
-        </button>
-      )}
       {isUser && (
         <button className="w-full px-4 py-2 text-[#CCCCCC] bg-[#242424] hover:bg-[#3E3F3E] rounded mt-2" onClick={onDelete}>
           Delete
