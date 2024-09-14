@@ -5,7 +5,7 @@ import Message from "@/models/message";
 import { MessageWithoutReplies, TopicSummary, PostPlain } from "@/types/types";
 import { currentUser } from "@clerk/nextjs/server";
 import { Roles } from "@/types/globals";
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@clerk/nextjs/server';
 
 export async function fetchTopicData(topicName: string): Promise<TopicSummary | { error: string }> {
   try {
@@ -83,10 +83,10 @@ export async function fetchTopicData(topicName: string): Promise<TopicSummary | 
       return { error: 'Unexpected error happened' || 'Failed to fetch topic' };
     }
   }
-}
+};
 
 export const checkRole = (role: Roles) => {
-  const { sessionClaims } = auth()
+  const { sessionClaims } = auth();
 
-  return sessionClaims?.metadata.role === role
-}
+  return sessionClaims?.metadata.role === role;
+};

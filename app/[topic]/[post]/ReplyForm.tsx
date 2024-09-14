@@ -2,7 +2,7 @@
 import { createMessage } from "@/app/actions";
 import { useMessageContext } from "@/lib/MessageContext";
 import { isElementInViewport } from "@/lib/utils";
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 import { FormEvent, useState, useRef, useEffect, FC } from "react";
 
 interface Params {
@@ -64,7 +64,7 @@ const ReplyForm: FC<Params> = ({ topic, post, isDefault, locked=false }) => {
       if (error) {
         if(error === 'You are banned'){  
           console.log("BANNED");
-          router.push("/banned")
+          router.push("/banned");
         }
         setError(error);
         return;

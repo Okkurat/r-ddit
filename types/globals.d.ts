@@ -1,4 +1,4 @@
-export {}
+export {};
 
 export type Roles = 'admin' | 'moderator'
 

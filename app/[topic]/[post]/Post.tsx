@@ -20,7 +20,7 @@ const Post = ({ post, topic, user, isMod }: PostProps) => {
       setMod(true);
     }
     setValue(user);
-  }, [setValue, user]);
+  }, [isMod, setMod, setValue, user]);
 
   return (
     <div className="bg-[#121212] rounded-lg border-2 border-[#242424]">

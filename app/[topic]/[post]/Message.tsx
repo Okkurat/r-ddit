@@ -144,6 +144,9 @@ const Message = ({ post, messages, message, isOP, topic, isTopLevel = true }: Re
             <p>Loading replies...</p>
           ) : (
             replyMessages.map((reply: MessageType) => {
+              if(reply.deleted?.isDeleted){
+                return null;
+              }
               return (
                 <div key={reply._id} className="border-r-2 border-t-2 border-l-2 mb-1 border-b-2 border-gray-600">
                 <Message
