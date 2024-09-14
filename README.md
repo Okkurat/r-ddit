@@ -13,6 +13,17 @@ This application is a textboard-style platform currently under active developmen
 
 Despite its name, the application functions more like a traditional textboard.
 
+### Features
+
+![Example view of the site](./assets/example.png)
+
+- User authentication with Clerk
+- Making posts with text. Replying to posts.
+- Mobile friendly user interface that works well on both desktop and mobile devices.
+- Viewing posts and comments
+- Basic mod tooling like banning users and deleting posts
+- Reporting posts. Reports can be moderated by the moderator.
+
 ### TODO List
 - **Refine typing**: Improve type safety by eliminating the use of `any` throughout the application.
 - **Write Tests**: Develop comprehensive tests to ensure the robustness and reliability of the application.
