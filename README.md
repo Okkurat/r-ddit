@@ -29,11 +29,11 @@ Despite its name, the application functions more like a traditional textboard.
 ### Installation
 1. Clone the repository:
 ```bash
-git clone https://github.com/arkki-io/my-next-app.git
+git clone https://github.com/Okkurat/r-ddit.git
 ```
 2. Navigate to the project directory:
 ```bash
-cd my-next-app
+cd r-ddit
 ```
 3. Install dependencies:
 ```bash
