@@ -36,7 +36,7 @@ const PostForm = ({ topic}: PostFormProps) => {
       if (error) {
         if(error === 'You are banned'){  
           console.log("BANNED");
-          router.push("/banned")
+          router.push("/banned");
         }
         setError(error);
         return;

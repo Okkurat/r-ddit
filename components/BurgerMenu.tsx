@@ -48,13 +48,14 @@ const BurgerMenu = ({ isUser, messageId }: BurgerMenuProps) => {
     }
   };
 
-  const handleModSubmit = async (reason: string, details: string) => {
-    console.log("Ban button clicked", messageId, reason, details);
+  const handleModSubmit = async (reason: string, details: string, duration: number) => {
+    console.log("Ban button clicked", messageId, reason, details, duration);
     try {
       const { error, success } = await banUser({
         messageId,
         reason,
-        details
+        details,
+        duration
       });
       if (error) {
         console.error(error);

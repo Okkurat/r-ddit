@@ -2,16 +2,17 @@ import React, { FormEvent, useState } from 'react';
 
 interface ModDialogProps {
   onClose: () => void;
-  onSubmit: (reason: string, details: string) => void;
+  onSubmit: (reason: string, details: string, duration: number) => void;
 }
 
 const ModDialog = ({ onClose, onSubmit }: ModDialogProps) => {
   const [banReason, setBanReason] = useState('');
   const [banDetails, setBanDetails] = useState('');
+  const [banDuration, setBanDuration] = useState(1);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onSubmit(banReason, banDetails);
+    onSubmit(banReason, banDetails, banDuration);
   };
 
   return (
@@ -36,6 +37,19 @@ const ModDialog = ({ onClose, onSubmit }: ModDialogProps) => {
             <option value="abuse">Abuse</option>
             <option value="other">Other</option>
           </select>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="ban-duration" className="block text-sm font-medium text-[#CCCCCC] mb-2">Ban duration (days)</label>
+          <input
+            type="number"
+            id="ban-duration"
+            name="duration"
+            value={banDuration}
+            onChange={(e) => setBanDuration(parseInt(e.target.value))}
+            min="1"
+            className="w-full bg-[#242424] text-[#CCCCCC] border border-[#3E3F3E] rounded px-3 py-2"
+            required
+          />
         </div>
         <div className="mb-4">
           <label htmlFor="report-details" className="block text-sm font-medium text-[#CCCCCC] mb-2">Details</label>

@@ -22,7 +22,7 @@ const MenuOptions = ({ isUser, onReport, onDelete, onBan }: MenuOptionsProps) =>
           Delete
         </button>
       )}
-      {isMod && (
+      {isMod && !isUser && (
         <button className="w-full px-4 py-2 text-[#CCCCCC] bg-[#242424] hover:bg-[#3E3F3E] rounded mt-2" onClick={onBan}>
           Ban
         </button>

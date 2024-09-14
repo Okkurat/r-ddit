@@ -30,12 +30,12 @@ const BanCard = ({ ban }: BanCardProps) => {
           onClick={handleUnban}
           className="bg-[#242424] text-[#CCCCCC] py-2 px-4 rounded hover:bg-[#3E3F3E]"
         >
-          Done
+          Unban
         </button>
       </div>
       <p><strong>Reason:</strong> {ban.reason}</p>
       <p><strong>Author:</strong> {ban.details}</p>
-      <p><strong>Timestamp:</strong> {ban.bannedUntil.toString()}</p>
+      <p><strong>Banned until:</strong> {ban.bannedUntil.toString()}</p>
       {showMessage && <MessageMini message={ban.message} />}
       <button
         className="mt-2 text-blue-500"

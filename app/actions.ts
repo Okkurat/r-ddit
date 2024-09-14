@@ -149,10 +149,7 @@ export async function createMessage(props: MessageProps){
     if(!post){
       return { error: 'Post not found' };
     }
-    console.log("POST", post);
-    console.log("POST MESSAGE",post.message);
-    console.log("POST MESSAGE AUTHOR", post.message.author);
-    console.log("POST MESSAGES", post.messages);
+
     let userId = 0;
     if(post.message.author !== user.id){
       const uniqueMessages = new Set(post.messages.map((message: MessageType) => message.author));
@@ -163,22 +160,17 @@ export async function createMessage(props: MessageProps){
         userId = post.uniques + 1;
         post.uniques += 1;
       }
-      console.log("POST Uniques", post.uniques);
-      console.log("HERE", uniqueMessages);
-      console.log("USERID", userId);
     }
     const newMessageData: MessageData = {
       content: props.message,
       author: user.id,
       userId
     };
-    console.log(props.post);
     const newMessage = new Message(newMessageData);
 
     if(!post){
       return { error: 'Post not found' };
     }
-    console.log(post);
     if(post.locked){
       return { error: 'Post is locked' };
     }
@@ -189,7 +181,6 @@ export async function createMessage(props: MessageProps){
       const msg = await Message.findById(message._id.toString()).lean().exec();
       if (!msg?.deleted?.isDeleted) {
         count++;
-        console.log(count);
       }
       if (count === 100) {
         post.locked = true;
@@ -350,9 +341,10 @@ interface BanProps {
   messageId: string;
   reason: string;
   details: string;
+  duration: number;
 }
 
-export async function banUser({ messageId, reason, details }: BanProps) {
+export async function banUser({ messageId, reason, details, duration }: BanProps) {
   try {
     const user = await currentUser();
     if (!user) {
@@ -378,16 +370,46 @@ export async function banUser({ messageId, reason, details }: BanProps) {
     if(!userr){  
       return { error: 'Message not found' };
     }
+    let post = await Post.findOne({ messages: messageId }).exec();
+
+    if(!post){
+      post = await Post.findOne({ message: messageId }).exec();
+      if(!post){
+        return { error: 'Post not found' };
+      }
+      if (Array.isArray(post.messages) && post.messages.length > 0) {
+        await Promise.all(
+          post.messages.map(async (msgId) => {
+            const msg = await Message.findById(msgId).exec();
+            if (msg) {
+              msg.markAsDeleted();
+            }
+          })
+        );
+      }
+    }
+    const topic = await Topic.findOne({ posts: post._id }).exec();
+    if(!topic){
+      return { error: 'Topic not found' };
+    }
     userr.markAsDeleted();
-    const ban = new Ban({
-      message: messageId,
-      userId: userr.author,
-      reason,
-      details,
-      bannedUntil: new Date(Date.now() + 1000 * 60 * 60 * 24),
-    });
-    await ban.save();
+    const banExist = await Ban.findOne({ userId: userr.author }).exec();
+    if(banExist){
+      banExist.bannedUntil = new Date(Date.now() + 1000 * 60 * 60 * 24 * duration);
+      await banExist.save();
+    }
+    else {
+      const ban = new Ban({
+        message: messageId,
+        userId: userr.author,
+        reason,
+        details,
+        bannedUntil: new Date(Date.now() + 1000 * 60 * 60 * 24 * duration),
+      });
+      await ban.save();
+    }
     await userr.save();
+    revalidatePath(`/${topic.name}/${post._id}`);
     return { success: 'User banned' };
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -536,8 +558,10 @@ export async function unBanUser({ banId }: UnBanProps) {
     if (!ban) {
       return { error: 'Ban not found' };
     }
-    await Ban.deleteOne({ _id: banId });
-    await ban.save();
+    const deleted =await Ban.deleteOne({ _id: banId });
+    if(!deleted){
+      return { error: 'Failed to delete ban' };
+    }
     revalidatePath('/modding/bans');
     return { success: 'User unbanned' };
   } catch (error: unknown) {
